@@ -56,10 +56,14 @@ export const onAuthStateChange = (callback: (user: User | null) => void) => {
 export const signInWithFacebook = async () => {
   try {
     const provider = new FacebookAuthProvider();
-    // Only request basic profile permissions for authentication
-    // These are the minimum required permissions
+    // Request approved permissions for business features
     provider.addScope('email');
     provider.addScope('public_profile');
+    provider.addScope('pages_manage_posts');
+    provider.addScope('pages_show_list');
+    provider.addScope('business_management');
+    provider.addScope('pages_read_engagement');
+    provider.addScope('instagram_basic');
     
     // Use popup for authentication (simpler user experience)
     const result = await signInWithPopup(auth, provider);

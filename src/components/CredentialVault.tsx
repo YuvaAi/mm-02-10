@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Contexts/AuthContext';
-import { validateFacebookCredentials, getFacebookPages } from '../api/facebook';
+import { validateFacebookCredentials, getFacebookPages, getFacebookAccessToken } from '../api/facebook';
 import { saveCredential, getCredentials } from '../firebase/firestore';
 import { handleSocialSignup } from '../utils/autoConnectSocialAccounts';
-import { Key, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft, Zap, RefreshCw } from 'lucide-react';
+import { Key, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft, Zap, RefreshCw, Link as LinkIcon } from 'lucide-react';
 import { UserCredentials } from '../firebase/types';
-import OAuthLoginButtons from './OAuthLoginButtons';
-import { isOAuthConfigured } from '../api/oauth';
 import CredentialDebugger from './CredentialDebugger';
 import GlassPanel from './GlassPanel';
+import { OAuthTokenService, isOAuthAvailable } from '../services/oauthTokenService';
+import { isOAuthConfigured } from '../api/oauth';
 
 interface FacebookPage {
   id: string;
@@ -386,8 +386,56 @@ const CredentialVault: React.FC = () => {
             <CredentialDebugger />
           </div>
 
-          {/* OAuth Quick Connect Section */}
+          {/* OAuth Status Section */}
           {isOAuthConfigured() && (
+            <GlassPanel variant="accent" className="animate-slide-in-left">
+              <div className="glass-panel-content">
+                <div className="glass-panel-header">
+                  <div className="flex items-center mb-4">
+                    <LinkIcon className="w-6 h-6 text-primary mr-2 icon-glow" />
+                    <h2 className="glass-panel-title text-xl font-semibold">OAuth Connection Status</h2>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  {/* Facebook OAuth Status */}
+                  <div className="flex items-center justify-between p-4 bg-bg rounded-lg border border-border">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-[#1877F2] rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">f</span>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-text">Facebook</h3>
+                        <p className="text-sm text-text-secondary">
+                          {isOAuthAvailable() ? 'Connected via OAuth' : 'Not connected'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {isOAuthAvailable() ? (
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                      ) : (
+                        <AlertCircle className="w-5 h-5 text-yellow-500" />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* OAuth Info */}
+                  <div className="bg-bg border border-info rounded-lg p-3 shadow-info">
+                    <p className="text-xs text-info">
+                      <strong>OAuth Status:</strong> {isOAuthAvailable() 
+                        ? 'You are connected via Facebook OAuth. Tokens are automatically managed.' 
+                        : 'No OAuth connection found. Use the Facebook login button on the login page to connect automatically.'
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </GlassPanel>
+          )}
+
+          {/* OAuth Quick Connect Section - Removed */}
+          {false && (
             <GlassPanel variant="purple" className="animate-slide-in-left">
               <div className="glass-panel-content">
                 <div className="glass-panel-header">

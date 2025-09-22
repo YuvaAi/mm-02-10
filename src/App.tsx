@@ -68,11 +68,7 @@ function App() {
           />
           <Route 
             path="/oauth/:platform/callback" 
-            element={
-              <PrivateRoute>
-                <OAuthCallback />
-              </PrivateRoute>
-            } 
+            element={<OAuthCallback />}
           />
           <Route 
             path="/auth-debug" 

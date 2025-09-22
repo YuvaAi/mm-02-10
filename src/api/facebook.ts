@@ -1,4 +1,5 @@
 // Facebook Graph API Integration
+import { OAuthTokenService } from '../services/oauthTokenService';
 export interface FacebookPermission {
   permission: string;
   status: string;
@@ -9,6 +10,40 @@ export interface FacebookPageInfo {
   name: string;
   access_token: string;
   category: string;
+}
+
+// Get Facebook access token automatically (OAuth or manual)
+export async function getFacebookAccessToken(): Promise<{
+  success: boolean;
+  accessToken?: string;
+  error?: string;
+  source: 'oauth' | 'manual' | 'none';
+}> {
+  try {
+    // Try OAuth first
+    const oauthResult = await OAuthTokenService.getFacebookToken();
+    if (oauthResult.success && oauthResult.accessToken) {
+      return {
+        success: true,
+        accessToken: oauthResult.accessToken,
+        source: 'oauth'
+      };
+    }
+
+    // Fallback to manual token (from credential vault)
+    // This would be implemented to get from stored credentials
+    return {
+      success: false,
+      error: 'No Facebook access token available. Please login with Facebook or add manual token.',
+      source: 'none'
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to get Facebook token',
+      source: 'none'
+    };
+  }
 }
 
 // Check Facebook permissions
@@ -219,7 +254,7 @@ export async function publishToFacebook(
     });
     
     console.log('⚠️ IMPORTANT: If publishing fails with permission errors, your Facebook app may need App Review for the "pages_manage_posts" permission. This is required by Facebook for production apps.');
-    console.log('📝 NOTE: Facebook Page posting requires a PAGE ACCESS TOKEN, not a user access token. The OAuth flow should save the page access token from /me/accounts endpoint.');
+    console.log('📝 NOTE: Facebook Page posting requires a PAGE ACCESS TOKEN, not a user access token. Please use the manual token extraction method.');
 
     // First validate credentials
     const validation = await validateFacebookCredentials(accessToken, pageId);

@@ -1,315 +1,212 @@
+// OAuth Configuration and Services
+export interface OAuthConfig {
+  facebook: {
+    clientId: string;
+    redirectUri: string;
+    scope: string;
+    authUrl: string;
+  };
+}
 
-// OAuth Integration for Social Media Platforms
-import { saveCredential } from '../firebase/firestore';
+export interface OAuthTokens {
+  accessToken: string;
+  expiresIn: number;
+  tokenType: string;
+  scope: string;
+}
 
-// OAuth Configuration
-const getRedirectUri = (platform: 'facebook' | 'linkedin') => {
+export interface FacebookOAuthResponse {
+  success: boolean;
+  accessToken?: string;
+  expiresIn?: number;
+  error?: string;
+  userInfo?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  pages?: Array<{
+    id: string;
+    name: string;
+    access_token: string;
+    category: string;
+  }>;
+}
+
+// Get redirect URI for OAuth
+const getRedirectUri = (platform: 'facebook') => {
   const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
   return `${baseUrl}/oauth/${platform}/callback`;
 };
 
-export const OAUTH_CONFIG = {
+// OAuth Configuration
+export const OAUTH_CONFIG: OAuthConfig = {
   facebook: {
     clientId: import.meta.env.VITE_FACEBOOK_APP_ID || '',
     redirectUri: getRedirectUri('facebook'),
-    scope: 'pages_show_list,pages_read_engagement,pages_manage_posts,pages_manage_engagement,instagram_basic,instagram_content_publish,instagram_manage_insights,instagram_manage_comments,ads_management,ads_read,business_management,public_profile,email',
-    authUrl: 'https://www.facebook.com/v21.0/dialog/oauth'
-  },
-  linkedin: {
-    clientId: import.meta.env.VITE_LINKEDIN_CLIENT_ID || '',
-    redirectUri: getRedirectUri('linkedin'),
-    scope: 'r_basicprofile,email,w_member_social,rw_ads,w_organization_social,r_organization_social,r_ads',
-    authUrl: 'https://www.linkedin.com/oauth/v2/authorization'
+    scope: 'public_profile,email,pages_manage_posts,pages_show_list,business_management,pages_read_engagement,instagram_basic',
+    authUrl: 'https://www.facebook.com/v8.0/dialog/oauth'
   }
 };
 
-// OAuth Response Types
-export interface OAuthResponse {
-  success: boolean;
-  accessToken?: string;
-  refreshToken?: string;
-  expiresIn?: number;
-  scope?: string;
-  error?: string;
-  userInfo?: any;
-}
+// Facebook OAuth Service
+export class FacebookOAuthService {
+  private static generateState(): string {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  }
 
-export interface FacebookOAuthResponse extends OAuthResponse {
-  pageInfo?: {
-    id: string;
-    name: string;
-    access_token: string;
-  }[];
-  instagramInfo?: {
-    id: string;
-    username: string;
-  };
-}
+  private static storeState(state: string): void {
+    sessionStorage.setItem('oauth_state', state);
+  }
 
-export interface LinkedInOAuthResponse extends OAuthResponse {
-  profile?: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email?: string;
-  };
-}
+  private static getStoredState(): string | null {
+    return sessionStorage.getItem('oauth_state');
+  }
 
-// Facebook OAuth Flow
-export class FacebookOAuth {
+  private static clearState(): void {
+    sessionStorage.removeItem('oauth_state');
+  }
+
+  // Initiate Facebook OAuth flow using implicit flow (simpler, no backend needed)
   static initiateAuth(): void {
+    // Check if Facebook App ID is configured
+    if (!OAUTH_CONFIG.facebook.clientId) {
+      console.error('Facebook App ID not configured. Please set VITE_FACEBOOK_APP_ID environment variable.');
+      alert('Facebook OAuth is not configured. Please contact the administrator.');
+      return;
+    }
+
+    const state = this.generateState();
+    this.storeState(state);
+    
     const params = new URLSearchParams({
       client_id: OAUTH_CONFIG.facebook.clientId,
       redirect_uri: OAUTH_CONFIG.facebook.redirectUri,
       scope: OAUTH_CONFIG.facebook.scope,
-      response_type: 'code',
-      state: this.generateState()
+      response_type: 'token', // Use implicit flow
+      state: state
     });
 
     const authUrl = `${OAUTH_CONFIG.facebook.authUrl}?${params.toString()}`;
-    window.location.href = authUrl;
-  }
-
-  static async handleCallback(code: string, state: string): Promise<FacebookOAuthResponse> {
-    try {
-      // Exchange code for access token
-      const tokenResponse = await fetch('https://graph.facebook.com/v21.0/oauth/access_token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          client_id: OAUTH_CONFIG.facebook.clientId,
-          client_secret: import.meta.env.VITE_FACEBOOK_APP_SECRET || '',
-          redirect_uri: OAUTH_CONFIG.facebook.redirectUri,
-          code: code
-        })
-      });
-
-      const tokenData = await tokenResponse.json();
-
-      if (!tokenResponse.ok) {
-        return {
-          success: false,
-          error: tokenData.error?.message || 'Failed to exchange code for token'
-        };
-      }
-
-      const accessToken = tokenData.access_token;
-      const expiresIn = tokenData.expires_in;
-
-      // Get user info and pages
-      const [userResponse, pagesResponse] = await Promise.all([
-        fetch(`https://graph.facebook.com/v21.0/me?access_token=${accessToken}`),
-        fetch(`https://graph.facebook.com/v21.0/me/accounts?access_token=${accessToken}`)
-      ]);
-
-      const userData = await userResponse.json();
-      const pagesData = await pagesResponse.json();
-
-      // Get Instagram business accounts
-      let instagramInfo = null;
-      if (pagesData.data && pagesData.data.length > 0) {
-        const firstPage = pagesData.data[0];
-        try {
-          const instagramResponse = await fetch(
-            `https://graph.facebook.com/v21.0/${firstPage.id}?fields=instagram_business_account&access_token=${firstPage.access_token}`
-          );
-          const instagramData = await instagramResponse.json();
-          if (instagramData.instagram_business_account) {
-            const instagramAccountResponse = await fetch(
-              `https://graph.facebook.com/v21.0/${instagramData.instagram_business_account.id}?fields=id,username&access_token=${firstPage.access_token}`
-            );
-            const instagramAccountData = await instagramAccountResponse.json();
-            instagramInfo = instagramAccountData;
-          }
-        } catch (error) {
-          console.warn('Could not fetch Instagram info:', error);
-        }
-      }
-
-      return {
-        success: true,
-        accessToken,
-        expiresIn,
-        scope: tokenData.scope,
-        userInfo: userData,
-        pageInfo: pagesData.data || [],
-        instagramInfo
-      };
-    } catch (error: unknown) {
-      const err = error as Error;
-      return {
-        success: false,
-        error: err.message || 'OAuth callback failed'
-      };
-    }
-  }
-
-  private static generateState(): string {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  }
-}
-
-// LinkedIn OAuth Flow
-export class LinkedInOAuth {
-  static initiateAuth(): void {
-    const params = new URLSearchParams({
-      response_type: 'code',
-      client_id: OAUTH_CONFIG.linkedin.clientId,
-      redirect_uri: OAUTH_CONFIG.linkedin.redirectUri,
-      state: this.generateState(),
-      scope: OAUTH_CONFIG.linkedin.scope
+    console.log('Facebook OAuth Configuration:', {
+      clientId: OAUTH_CONFIG.facebook.clientId,
+      redirectUri: OAUTH_CONFIG.facebook.redirectUri,
+      scope: OAUTH_CONFIG.facebook.scope,
+      authUrl: authUrl
     });
-
-    const authUrl = `${OAUTH_CONFIG.linkedin.authUrl}?${params.toString()}`;
+    
+    console.log('Redirecting to Facebook OAuth:', authUrl);
     window.location.href = authUrl;
   }
 
-  static async handleCallback(code: string, state: string): Promise<LinkedInOAuthResponse> {
+  // Handle OAuth callback (implicit flow - access token in URL fragment)
+  static async handleCallback(accessToken: string, state: string): Promise<FacebookOAuthResponse> {
     try {
-      // Exchange code for access token
-      const tokenResponse = await fetch('https://www.linkedin.com/oauth/v2/accessToken', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          code: code,
-          redirect_uri: OAUTH_CONFIG.linkedin.redirectUri,
-          client_id: OAUTH_CONFIG.linkedin.clientId,
-          client_secret: import.meta.env.VITE_LINKEDIN_CLIENT_SECRET || ''
-        })
-      });
-
-      const tokenData = await tokenResponse.json();
-
-      if (!tokenResponse.ok) {
+      // Verify state parameter
+      const storedState = this.getStoredState();
+      if (!storedState || storedState !== state) {
         return {
           success: false,
-          error: tokenData.error_description || 'Failed to exchange code for token'
+          error: 'Invalid state parameter'
         };
       }
+      this.clearState();
 
-      const accessToken = tokenData.access_token;
-      const expiresIn = tokenData.expires_in;
+      console.log('OAuth access token received:', accessToken);
+      console.log('State parameter:', state);
+      
+      // For implicit flow, we already have the access token
+      const expiresIn = 3600; // Default expiration
 
-      // Get user profile
-      const profileResponse = await fetch('https://api.linkedin.com/v2/people/~:(id,firstName,lastName,emailAddress)', {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      // Get user info (basic permissions only)
+      const userResponse = await fetch(`https://graph.facebook.com/v21.0/me?access_token=${accessToken}`);
+      const userData = await userResponse.json();
 
-      const profileData = await profileResponse.json();
+      // Try to get pages (may fail if permissions not granted)
+      let pagesData = { data: [] };
+      try {
+        const pagesResponse = await fetch(`https://graph.facebook.com/v21.0/me/accounts?access_token=${accessToken}`);
+        pagesData = await pagesResponse.json();
+      } catch (error) {
+        console.warn('Could not fetch pages - permissions may not be granted:', error);
+      }
 
       return {
         success: true,
         accessToken,
         expiresIn,
-        scope: tokenData.scope,
-        profile: {
-          id: profileData.id,
-          firstName: profileData.firstName?.localized?.en_US || '',
-          lastName: profileData.lastName?.localized?.en_US || '',
-          email: profileData.emailAddress
-        }
+        userInfo: {
+          id: userData.id,
+          name: userData.name,
+          email: userData.email
+        },
+        pages: pagesData.data || []
       };
-    } catch (error: unknown) {
-      const err = error as Error;
+
+    } catch (error) {
+      console.error('OAuth callback error:', error);
       return {
         success: false,
-        error: err.message || 'LinkedIn OAuth callback failed'
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
       };
     }
   }
 
-  private static generateState(): string {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  // Store tokens securely
+  static storeTokens(tokens: OAuthTokens, userInfo: any): void {
+    const tokenData = {
+      ...tokens,
+      userInfo,
+      timestamp: Date.now()
+    };
+    
+    // Store in sessionStorage for security (cleared on browser close)
+    sessionStorage.setItem('facebook_oauth_tokens', JSON.stringify(tokenData));
+    
+    // Also store in localStorage for persistence (with expiration)
+    const expirationTime = Date.now() + (tokens.expiresIn * 1000);
+    localStorage.setItem('facebook_oauth_expires', expirationTime.toString());
   }
-}
 
-// OAuth Callback Handler
-export class OAuthCallbackHandler {
-  static async handleFacebookCallback(userId: string, code: string, state: string): Promise<{ success: boolean; error?: string }> {
+  // Get stored tokens
+  static getStoredTokens(): OAuthTokens | null {
     try {
-      const result = await FacebookOAuth.handleCallback(code, state);
+      const tokenData = sessionStorage.getItem('facebook_oauth_tokens');
+      if (!tokenData) return null;
+
+      const parsed = JSON.parse(tokenData);
+      const expirationTime = localStorage.getItem('facebook_oauth_expires');
       
-      if (!result.success) {
-        return { success: false, error: result.error };
+      if (expirationTime && Date.now() > parseInt(expirationTime)) {
+        this.clearTokens();
+        return null;
       }
 
-      // Save Facebook credentials
-      if (result.pageInfo && result.pageInfo.length > 0) {
-        const firstPage = result.pageInfo[0];
-        await saveCredential(userId, {
-          type: 'facebook',
-          accessToken: firstPage.access_token,
-          pageId: firstPage.id,
-          pageName: firstPage.name,
-          expiresIn: result.expiresIn,
-          createdAt: new Date().toISOString(),
-          lastValidated: new Date().toISOString()
-        });
-      }
-
-      // Save Instagram credentials if available
-      if (result.instagramInfo) {
-        await saveCredential(userId, {
-          type: 'instagram',
-          accessToken: result.accessToken!,
-          instagramUserId: result.instagramInfo.id,
-          username: result.instagramInfo.username,
-          expiresIn: result.expiresIn,
-          createdAt: new Date().toISOString(),
-          lastValidated: new Date().toISOString()
-        });
-      }
-
-      return { success: true };
-    } catch (error: unknown) {
-      const err = error as Error;
-      return { success: false, error: err.message };
+      return {
+        accessToken: parsed.accessToken,
+        expiresIn: parsed.expiresIn,
+        tokenType: parsed.tokenType,
+        scope: parsed.scope
+      };
+    } catch (error) {
+      console.error('Error retrieving stored tokens:', error);
+      return null;
     }
   }
 
-  static async handleLinkedInCallback(userId: string, code: string, state: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      const result = await LinkedInOAuth.handleCallback(code, state);
-      
-      if (!result.success) {
-        return { success: false, error: result.error };
-      }
+  // Clear stored tokens
+  static clearTokens(): void {
+    sessionStorage.removeItem('facebook_oauth_tokens');
+    localStorage.removeItem('facebook_oauth_expires');
+  }
 
-      // Save LinkedIn credentials
-      await saveCredential(userId, {
-        type: 'linkedin',
-        accessToken: result.accessToken!,
-        linkedInUserId: result.profile!.id,
-        firstName: result.profile!.firstName,
-        lastName: result.profile!.lastName,
-        email: result.profile!.email,
-        expiresIn: result.expiresIn,
-        createdAt: new Date().toISOString(),
-        lastValidated: new Date().toISOString()
-      });
-
-      return { success: true };
-    } catch (error: unknown) {
-      const err = error as Error;
-      return { success: false, error: err.message };
-    }
+  // Check if user is authenticated
+  static isAuthenticated(): boolean {
+    return this.getStoredTokens() !== null;
   }
 }
 
 // Utility function to check if OAuth is configured
-export function isOAuthConfigured(): boolean {
-  return !!(
-    OAUTH_CONFIG.facebook.clientId &&
-    OAUTH_CONFIG.linkedin.clientId &&
-    import.meta.env.VITE_FACEBOOK_APP_SECRET &&
-    import.meta.env.VITE_LINKEDIN_CLIENT_SECRET
-  );
-}
+export const isOAuthConfigured = (): boolean => {
+  return !!(import.meta.env.VITE_FACEBOOK_APP_ID && import.meta.env.VITE_APP_URL);
+};
