@@ -1,0 +1,440 @@
+/* MarketMate Black + Turquoise Mix Theme */
+/* Modern, Sleek, Professional SaaS Dashboard Theme */
+
+:root {
+  /* Core Color Palette */
+  --color-bg: #FFFFFF;           /* Pure white */
+  --color-bg-alt: #FAFAFA;       /* Light gray */
+  --color-primary: #366d74;      /* Turquoise default */
+  --color-accent: #366d74;       /* Turquoise accent */
+  --color-text: #1F2937;         /* Dark gray text */
+  --color-muted: #6B7280;        /* Muted gray */
+  
+  /* Extended Color Palette */
+  --color-primary-light: #4a8a91;
+  --color-primary-dark: #2a5a60;  /* Darker turquoise for hover */
+  --color-accent-light: #4a8a91;
+  --color-accent-dark: #2a5a60;
+  
+  /* Background Variations */
+  --color-bg-secondary: #F9FAFB;  /* Very light gray */
+  --color-bg-tertiary: #F3F4F6;   /* Light gray for cards */
+  
+  /* Border Colors */
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-border-turquoise: rgba(54, 109, 116, 0.3);
+  
+  /* Status Colors */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+  
+  /* Gradients */
+  --color-gradient: #FFFFFF;
+  --color-gradient-alt: #FAFAFA;
+  --color-gradient-button: #366d74;
+  --color-gradient-accent: #366d74;
+  --color-gradient-reverse: #2a5a60;
+  
+  /* Glow Effects */
+  --glow-turquoise: 0 0 20px rgba(54, 109, 116, 0.4);
+  --glow-turquoise-strong: 0 0 30px rgba(54, 109, 116, 0.6);
+  --glow-teal: 0 0 20px rgba(74, 138, 145, 0.4);
+  --glow-teal-strong: 0 0 30px rgba(74, 138, 145, 0.6);
+  --glow-black: 0 0 20px rgba(0, 0, 0, 0.8);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+  --transition-glow: 300ms ease-in-out;
+}
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Gradient Animation */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Utility Classes */
+.gradient-main {
+  background: var(--color-bg);
+}
+
+.gradient-alt {
+  background: var(--color-bg-alt);
+}
+
+.gradient-button {
+  background: var(--color-primary);
+}
+
+.gradient-accent {
+  background: var(--color-accent);
+}
+
+.gradient-reverse {
+  background: var(--color-primary-dark);
+}
+
+/* Glow Effects */
+.glow-turquoise {
+  box-shadow: var(--glow-turquoise);
+}
+
+.glow-turquoise-strong {
+  box-shadow: var(--glow-turquoise-strong);
+}
+
+.glow-teal {
+  box-shadow: var(--glow-teal);
+}
+
+.glow-teal-strong {
+  box-shadow: var(--glow-teal-strong);
+}
+
+.glow-black {
+  box-shadow: var(--glow-black);
+}
+
+/* Component Base Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left var(--transition-slow);
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: var(--shadow-md), var(--glow-turquoise);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+  color: white;
+  box-shadow: var(--shadow-lg), var(--glow-turquoise-strong);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: var(--color-bg);
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:hover {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: var(--shadow-lg), var(--glow-turquoise);
+  transform: translateY(-2px);
+}
+
+.btn-accent {
+  background: var(--color-accent);
+  color: white;
+  box-shadow: var(--shadow-md), var(--glow-turquoise);
+  transition: all 0.3s ease;
+}
+
+.btn-accent:hover {
+  background: var(--color-accent-dark);
+  color: white;
+  box-shadow: var(--shadow-lg), var(--glow-turquoise-strong);
+  transform: translateY(-2px);
+}
+
+.btn-gradient {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: var(--shadow-md), var(--glow-turquoise);
+  transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+  background: var(--color-primary-dark);
+  color: white;
+  box-shadow: var(--shadow-lg), var(--glow-turquoise-strong);
+  transform: translateY(-2px);
+}
+
+.card {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-xl);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(65, 56, 56, 0.05) 50%, transparent 70%);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card-black {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md), var(--glow-turquoise);
+}
+
+.card-black:hover {
+  box-shadow: var(--shadow-lg), var(--glow-turquoise-strong);
+  transform: translateY(-4px);
+}
+
+.card-purple {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border-turquoise);
+  box-shadow: var(--shadow-md), var(--glow-black);
+}
+
+.card-purple:hover {
+  box-shadow: var(--shadow-lg), var(--glow-black);
+  transform: translateY(-4px);
+}
+
+.card-gradient {
+  background: var(--color-gradient-alt);
+  border: 1px solid var(--color-border-turquoise);
+  box-shadow: var(--shadow-md), var(--glow-turquoise);
+}
+
+.card-gradient:hover {
+  box-shadow: var(--shadow-lg), var(--glow-turquoise-strong);
+  transform: translateY(-4px);
+}
+
+.input {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(65, 56, 56, 0.1), var(--glow-turquoise);
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+}
+
+.modal {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border-turquoise);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl), var(--glow-turquoise);
+}
+
+.table {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.table th {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-weight: 600;
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table td {
+  color: var(--color-text);
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.toast {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border-turquoise);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg), var(--glow-turquoise);
+  color: var(--color-text);
+}
+
+.nav {
+  background: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border-turquoise);
+  box-shadow: var(--shadow-sm), var(--glow-turquoise);
+}
+
+.nav-item {
+  color: var(--color-muted);
+  transition: color var(--transition-fast);
+  position: relative;
+}
+
+.nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--color-primary);
+  transition: width var(--transition-normal);
+}
+
+.nav-item:hover,
+.nav-item.active {
+  color: var(--color-text);
+}
+
+.nav-item:hover::after,
+.nav-item.active::after {
+  width: 100%;
+}
+
+/* Link Styles */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--color-primary);
+  transition: width var(--transition-normal);
+}
+
+a:hover {
+  color: var(--color-accent);
+}
+
+a:hover::after {
+  width: 100%;
+}
+
+/* Chart Colors */
+.chart-primary {
+  color: var(--color-primary);
+}
+
+.chart-accent {
+  color: var(--color-accent);
+}
+
+.chart-grid {
+  color: var(--color-border);
+}
+
+/* Focus States for Accessibility */
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(65, 56, 56, 0.3);
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  body {
+    background: var(--color-bg);
+    animation: none;
+  }
+  
+  .gradient-main {
+    background: var(--color-bg);
+    animation: none;
+  }
+}
