@@ -558,7 +558,7 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
                     <button
                       onClick={handleDirectSaveCredentials}
                       disabled={isConnecting}
-                      className="bg-success text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium shadow-md hover:shadow-lg transition-all duration-250"
+                      className="bg-success text-gray-900 px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium shadow-md hover:shadow-lg transition-all duration-250"
                     >
                       {isConnecting ? (
                         <div className="flex items-center space-x-2">
@@ -583,7 +583,7 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
                     <button
                       onClick={handleRefreshCredentials}
                       disabled={isRefreshing}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
+                      className="bg-blue-600 text-gray-900 px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
                     >
                       {isRefreshing ? (
                         <div className="flex items-center space-x-2">
@@ -614,7 +614,7 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
                   <button
                     onClick={handleDirectSaveCredentials}
                     disabled={isConnecting}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                    className="bg-green-600 text-gray-900 px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                   >
                     {isConnecting ? (
                       <div className="flex items-center space-x-2">
@@ -635,7 +635,7 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
                       console.log('Has credentials:', hasCredentials);
                       loadAllCredentials();
                     }}
-                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 text-sm font-medium"
+                    className="bg-gray-600 text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-700 text-sm font-medium"
                   >
                     Debug
                   </button>
@@ -658,14 +658,14 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-text mb-2">
+              <label className="block text-sm font-bold text-gray-900 mb-2">
                 Content Prompt
               </label>
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder={`Describe the content you want to create for ${config.name}...`}
-                className="w-full px-3 py-2 bg-bg-alt border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none text-text placeholder-text-muted"
+                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-900 placeholder-gray-500"
                 rows={4}
               />
             </div>
@@ -674,7 +674,7 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
             <div className="space-y-4 pt-4 border-t border-gray-200">
               {/* Media Upload */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-900 mb-2">
                   Upload Media (Images/Videos)
                 </label>
                 <div className="flex items-center space-x-4">
@@ -714,7 +714,7 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
 
               {/* Max Length */}
               <div>
-                <label className="block text-sm font-medium text-text mb-2">
+                <label className="block text-sm font-bold text-gray-900 mb-2">
                   Max Content Length (Words)
                 </label>
                 <div className="flex items-center space-x-4">
@@ -729,7 +729,7 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
                     aria-label="Content length slider"
                     title="Adjust maximum content length"
                   />
-                  <span className="text-sm text-text-secondary min-w-[60px]">{maxLength} words</span>
+                  <span className="text-sm text-gray-700 min-w-[60px]">{maxLength} words</span>
                 </div>
               </div>
 
@@ -743,8 +743,8 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
                     onChange={(e) => setIncludeHashtags(e.target.checked)}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <Hash className="w-4 h-4 text-text-secondary" />
-                  <span className="text-sm text-text">Include Hashtags</span>
+                  <Hash className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm text-gray-900">Include Hashtags</span>
                 </label>
 
                 {/* Image Prompt Only Toggle */}
@@ -755,8 +755,8 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
                     onChange={(e) => setImagePromptOnly(e.target.checked)}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <Image className="w-4 h-4 text-text-secondary" />
-                  <span className="text-sm text-text">Image Prompt Only</span>
+                  <Image className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm text-gray-900">Image Prompt Only</span>
                 </label>
 
                 {/* Generate Post with Caption Toggle */}
@@ -776,7 +776,7 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
               <button
                 onClick={handleGenerate}
                 disabled={!prompt.trim() || isGenerating}
-                className="w-full bg-gradient-button text-primary-contrast py-3 px-4 rounded-lg font-medium hover:bg-gradient-reverse transition-all duration-250 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-purple hover:shadow-purple-strong btn-ripple"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-gray-900 py-4 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
               >
                 {isGenerating ? (
                   <>
@@ -924,7 +924,7 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
                 <button
                   onClick={handlePublish}
                   disabled={isPublishing}
-                  className="w-full bg-gradient-accent text-primary-contrast py-3 px-4 rounded-lg font-medium hover:bg-gradient-reverse transition-all duration-250 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-violet hover:shadow-violet-strong btn-ripple"
+                  className="w-full bg-gradient-accent text-gray-900 py-3 px-4 rounded-lg font-medium hover:bg-gradient-reverse transition-all duration-250 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-violet hover:shadow-violet-strong btn-ripple"
                 >
                   {isPublishing ? (
                     <>

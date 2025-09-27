@@ -5,7 +5,7 @@ import { generateFacebookAd } from '../api/adGenerator';
 import { generateImageDescription, generateImageUrl, publishToFacebookWithImage } from '../api/gemini';
 import { createCompleteFacebookAdCampaign, createNewCampaign, getExistingCampaigns, createFacebookAdWithWorkflow } from '../services/facebookAdsService';
 import { useAuth } from '../Contexts/AuthContext';
-import { getCredential, saveCredential } from '../firebase/firestore';
+import { getCredential, saveCredential, getCredentials } from '../firebase/firestore';
 import MultiPlatformPublisher from './MultiPlatformPublisher';
 
 interface AdResult {
@@ -405,10 +405,31 @@ const FacebookAdGenerator: React.FC = () => {
     }));
   };
 
-  const handleOpenCredentialModal = () => {
+  const handleOpenCredentialModal = async () => {
     if (newCampaignResult) {
       setAdsAccountId(newCampaignResult.adAccountId || '');
       setAdsCampaignId(newCampaignResult.campaignId || '');
+      
+      // Try to get the access token from session storage first
+      const sessionToken = sessionStorage.getItem('facebook_access_token');
+      if (sessionToken) {
+        setAdsAccessToken(sessionToken);
+      } else {
+        // If not in session storage, try to get from saved credentials
+        try {
+          if (currentUser) {
+            const result = await getCredentials(currentUser.uid);
+            const credentials = result.data || [];
+            const facebookCred = credentials.find(cred => cred.type === 'facebook');
+            if (facebookCred) {
+              setAdsAccessToken(facebookCred.accessToken || '');
+            }
+          }
+        } catch (error) {
+          console.error('Error loading Facebook credentials:', error);
+        }
+      }
+      
       setShowCredentialModal(true);
     }
   };
@@ -428,10 +449,27 @@ const FacebookAdGenerator: React.FC = () => {
     setAdsCredentialMessage('');
 
     try {
+      // Try to get pageId from regular Facebook credentials
+      let pageId: string | undefined;
+      try {
+        const { getCredentials } = await import('../firebase/firestore');
+        const credentialsResult = await getCredentials(currentUser.uid);
+        if (credentialsResult.success && credentialsResult.data) {
+          const facebookCred = credentialsResult.data.find(cred => cred.type === 'facebook');
+          if (facebookCred && facebookCred.pageId) {
+            pageId = facebookCred.pageId;
+            console.log('🔍 Found pageId from Facebook credentials:', pageId);
+          }
+        }
+      } catch (error) {
+        console.log('Could not retrieve pageId from Facebook credentials:', error);
+      }
+
       const payload = {
         type: 'facebook_ads',
         accessToken: adsAccessToken.trim(),
         adAccountId: adsAccountId.trim(),
+        pageId: pageId, // Include pageId if available
         campaignId: adsCampaignId.trim() || undefined,
         createdAt: new Date().toISOString(),
         lastValidated: new Date().toISOString(),
@@ -2568,6 +2606,18 @@ const FacebookAdGenerator: React.FC = () => {
                   Save your Facebook Ads credentials to the Credential Vault for future use. 
                   This will allow you to create Ad Sets and Ads without re-entering your credentials.
                 </p>
+                
+                {adsAccessToken && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <span className="text-sm text-green-800 font-medium">Access Token Auto-Populated</span>
+                    </div>
+                    <p className="text-xs text-green-700 mt-1">
+                      Your Facebook access token has been automatically loaded from your session.
+                    </p>
+                  </div>
+                )}
 
                 {/* Access Token */}
                 <div>

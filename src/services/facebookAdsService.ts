@@ -1,6 +1,7 @@
 import { getCredential } from '../firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { createFacebookAdsApiUrl } from '../utils/facebookAdsUtils';
+import { convertCountryNamesToCodes } from '../utils/countryMapping';
 
 /**
  * Utility functions for image handling
@@ -131,11 +132,17 @@ async function getFacebookAdsCredentials(userId: string): Promise<FacebookAdsCre
   try {
     // First try to get facebook_ads credentials
     let { success, data } = await getCredential(userId, 'facebook_ads');
+    let facebookData: any = null;
     
-    // If not found, try to get regular facebook credentials as fallback
+    // Always try to get regular facebook credentials for pageId
+    const facebookResult = await getCredential(userId, 'facebook');
+    if (facebookResult.success && facebookResult.data) {
+      facebookData = facebookResult.data;
+    }
+    
+    // If facebook_ads credentials not found, use facebook credentials as fallback
     if (!success || !data) {
-      console.log('Facebook Ads credentials not found, trying Facebook credentials as fallback...');
-      const facebookResult = await getCredential(userId, 'facebook');
+      console.log('Facebook Ads credentials not found, using Facebook credentials as fallback...');
       if (facebookResult.success && facebookResult.data) {
         success = facebookResult.success;
         data = facebookResult.data;
@@ -151,7 +158,7 @@ async function getFacebookAdsCredentials(userId: string): Promise<FacebookAdsCre
     return {
       accessToken: data.accessToken,
       adAccountId: data.adAccountId || import.meta.env.VITE_REACT_APP_FACEBOOK_AD_ACCOUNT_ID || '',
-      pageId: data.pageId
+      pageId: data.pageId || (facebookData ? facebookData.pageId : null)
     };
   } catch (error) {
     console.error('Failed to get Facebook Ads credentials:', error);
@@ -273,7 +280,7 @@ export async function createNewAdSet(
     // Prepare targeting object with proper Facebook API format
     const targeting: any = {
       geo_locations: {
-        countries: adSetData.targeting.countries.map(country => country.toUpperCase())
+        countries: convertCountryNamesToCodes(adSetData.targeting.countries)
       },
       age_min: adSetData.targeting.ageMin,
       age_max: adSetData.targeting.ageMax,
@@ -361,7 +368,7 @@ export async function createNewAdSet(
       bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
       targeting: {
         geo_locations: {
-          countries: adSetData.targeting.countries.map(country => country.toUpperCase())
+          countries: convertCountryNamesToCodes(adSetData.targeting.countries)
         },
         age_min: adSetData.targeting.ageMin,
         age_max: adSetData.targeting.ageMax,
@@ -369,7 +376,7 @@ export async function createNewAdSet(
       },
       start_time: Math.floor(startDate.getTime() / 1000), // Unix timestamp
       end_time: Math.floor(endDate.getTime() / 1000), // Unix timestamp
-      status: 'PAUSED',
+      status: 'ACTIVE',
       access_token: credentials.accessToken
     };
 
@@ -485,7 +492,7 @@ export async function createCampaign(
       body: JSON.stringify({
         name: campaignName,
         objective: objective,
-        status: 'PAUSED', // Start paused for safety
+        status: 'ACTIVE', // Start paused for safety
         special_ad_categories: [],
         access_token: credentials.accessToken
       })
@@ -533,7 +540,7 @@ export async function createAdSet(
       bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
       targeting: {
         geo_locations: {
-          countries: [location.country],
+          countries: convertCountryNamesToCodes([location.country]),
           cities: location.city ? [{ name: location.city, radius: 25, distance_unit: 'mile' }] : []
         },
         age_min: 18,
@@ -544,7 +551,7 @@ export async function createAdSet(
       },
       start_time: new Date(startDate).toISOString(),
       end_time: new Date(endDate).toISOString(),
-      status: 'PAUSED',
+      status: 'ACTIVE',
       access_token: credentials.accessToken
     };
 
@@ -638,14 +645,42 @@ async function uploadImageToFacebook(
 
     const imageResult = await imageUploadResponse.json();
     
+    // 🔍 DEBUG: Log the entire response from Facebook
+    console.log('🔍 Facebook Image Upload Response Status:', imageUploadResponse.status);
+    console.log('🔍 Facebook Image Upload Response Headers:', Object.fromEntries(imageUploadResponse.headers.entries()));
+    console.log('🔍 Facebook Image Upload Full Response Body:', JSON.stringify(imageResult, null, 2));
+    
     if (!imageUploadResponse.ok) {
-      console.error('Image upload error:', imageResult);
+      console.error('❌ Image upload error - Status:', imageUploadResponse.status);
+      console.error('❌ Image upload error - Response:', imageResult);
       throw new Error(imageResult.error?.message || 'Failed to upload image to Facebook');
     }
 
-    const imageHash = imageResult.images?.ad_image?.hash || imageResult.hash;
+    // 🔍 DEBUG: Log the extracted image hash
+    console.log('🔍 imageResult.images:', imageResult.images);
+    console.log('🔍 imageResult.images?.ad_image:', imageResult.images?.ad_image);
+    console.log('🔍 imageResult.hash:', imageResult.hash);
+    
+    // Fix: Facebook returns the hash in images[filename].hash structure
+    let imageHash = imageResult.images?.ad_image?.hash || imageResult.hash;
+    
+    // If the above doesn't work, try to get hash from the first image in the images object
+    if (!imageHash && imageResult.images) {
+      const imageKeys = Object.keys(imageResult.images);
+      console.log('🔍 Available image keys:', imageKeys);
+      if (imageKeys.length > 0) {
+        const firstImageKey = imageKeys[0];
+        imageHash = imageResult.images[firstImageKey]?.hash;
+        console.log('🔍 Found hash in images[' + firstImageKey + '].hash:', imageHash);
+      }
+    }
+    
+    console.log('🔍 Final extracted image hash:', imageHash);
     
     if (!imageHash) {
+      console.error('❌ No image hash found in Facebook response');
+      console.error('❌ Response status:', imageUploadResponse.status);
+      console.error('❌ Response body:', JSON.stringify(imageResult, null, 2));
       throw new Error('No image hash returned from Facebook');
     }
 
@@ -680,30 +715,53 @@ export async function createAdCreative(
 
     const imageHash = imageUploadResult.imageHash!;
 
+    console.log('🔍 Creating ad creative with credentials:', {
+      hasAccessToken: !!credentials.accessToken,
+      adAccountId: credentials.adAccountId,
+      pageId: credentials.pageId,
+      pageIdType: typeof credentials.pageId
+    });
+
+    if (!credentials.pageId) {
+      console.error('❌ Page ID is missing from credentials!');
+      console.error('❌ Available credentials data:', credentials);
+      throw new Error('Page ID is required for ad creative creation');
+    }
+
+    const requestBody = {
+      name: `Creative for Ad Set ${adSetId}`,
+      object_story_spec: {
+        page_id: credentials.pageId,
+        link_data: {
+          message: adText,
+          image_hash: imageHash,
+          link: import.meta.env.VITE_REACT_APP_WEBSITE_URL || 'https://marketmate-101.web.app'
+        }
+      },
+      access_token: credentials.accessToken
+    };
+
+    console.log('🔍 Final request body for ad creative:', JSON.stringify(requestBody, null, 2));
+
     // Create the ad creative
     const creativeResponse = await fetch(createFacebookAdsApiUrl(credentials.adAccountId, 'adcreatives'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        name: `Creative for Ad Set ${adSetId}`,
-        object_story_spec: {
-          page_id: credentials.pageId,
-          link_data: {
-            message: adText,
-            image_hash: imageHash,
-            link: import.meta.env.VITE_REACT_APP_WEBSITE_URL || 'https://example.com'
-          }
-        },
-        access_token: credentials.accessToken
-      })
+      body: JSON.stringify(requestBody)
     });
 
     const creativeResult = await creativeResponse.json();
     
+    // 🔍 DEBUG: Log the entire creative creation response
+    console.log('🔍 Facebook Ad Creative Response Status:', creativeResponse.status);
+    console.log('🔍 Facebook Ad Creative Response Body:', JSON.stringify(creativeResult, null, 2));
+    
     if (!creativeResponse.ok) {
-      console.error('Creative creation error:', creativeResult);
+      console.error('❌ Ad creative creation error - Status:', creativeResponse.status);
+      console.error('❌ Ad creative creation error - Response:', creativeResult);
+      console.error('❌ Ad creative creation error - Request body was:', JSON.stringify(requestBody, null, 2));
       throw new Error(creativeResult.error?.message || 'Failed to create ad creative');
     }
 
@@ -740,7 +798,7 @@ export async function createAd(
         creative: {
           creative_id: creativeId
         },
-        status: 'PAUSED',
+        status: 'ACTIVE',
         access_token: credentials.accessToken
       })
     });

@@ -1,4 +1,5 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import { convertCountryNameToCode } from '../utils/countryMapping';
 
 interface CreateAdRequest {
   post_id: string;
@@ -69,7 +70,10 @@ export async function createFacebookAdCampaign(
     const budgetCents = Math.round(campaignData.budget * 100);
     
     // Create campaign
-    const campaignResponse = await fetch(`https://graph.facebook.com/v21.0/act_${import.meta.env.VITE_REACT_APP_FACEBOOK_AD_ACCOUNT_ID}/campaigns`, {
+    const adAccountId = import.meta.env.VITE_REACT_APP_FACEBOOK_AD_ACCOUNT_ID?.startsWith('act_') 
+      ? import.meta.env.VITE_REACT_APP_FACEBOOK_AD_ACCOUNT_ID 
+      : `act_${import.meta.env.VITE_REACT_APP_FACEBOOK_AD_ACCOUNT_ID}`;
+    const campaignResponse = await fetch(`https://graph.facebook.com/v21.0/${adAccountId}/campaigns`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -77,7 +81,7 @@ export async function createFacebookAdCampaign(
       body: JSON.stringify({
         name: campaignData.campaignName,
         objective: campaignData.objective,
-        status: 'PAUSED', // Start paused for safety
+        status: 'ACTIVE', // Start paused for safety
         special_ad_categories: [],
         access_token: campaignData.accessToken
       })
@@ -93,7 +97,7 @@ export async function createFacebookAdCampaign(
     console.log('✅ Campaign created:', campaignId);
 
     // Create ad set
-    const adSetResponse = await fetch(`https://graph.facebook.com/v21.0/act_${import.meta.env.VITE_REACT_APP_FACEBOOK_AD_ACCOUNT_ID}/adsets`, {
+    const adSetResponse = await fetch(`https://graph.facebook.com/v21.0/${adAccountId}/adsets`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -110,7 +114,7 @@ export async function createFacebookAdCampaign(
         bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
         targeting: {
           geo_locations: {
-            countries: [campaignData.location.country],
+            countries: [convertCountryNameToCode(campaignData.location.country)],
             cities: campaignData.location.city ? [{ name: campaignData.location.city, radius: 25, distance_unit: 'mile' }] : []
           },
           age_min: 18,
@@ -120,7 +124,7 @@ export async function createFacebookAdCampaign(
         },
         start_time: new Date(campaignData.startDate).toISOString(),
         end_time: new Date(campaignData.endDate).toISOString(),
-        status: 'PAUSED',
+        status: 'ACTIVE',
         access_token: campaignData.accessToken
       })
     });
@@ -134,8 +138,65 @@ export async function createFacebookAdCampaign(
     const adSetId = adSetResult.id;
     console.log('✅ Ad Set created:', adSetId);
 
+    // First, upload the image to Facebook to get the image hash
+    console.log('🖼️ Uploading image to Facebook...');
+    const imageUploadResponse = await fetch(`https://graph.facebook.com/v21.0/${adAccountId}/adimages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        filename: 'ad_image.jpg',
+        url: campaignData.adImage,
+        access_token: campaignData.accessToken
+      })
+    });
+
+    const imageResult = await imageUploadResponse.json();
+    
+    // 🔍 DEBUG: Log the entire response from Facebook
+    console.log('🔍 Facebook Image Upload Response Status:', imageUploadResponse.status);
+    console.log('🔍 Facebook Image Upload Response Headers:', Object.fromEntries(imageUploadResponse.headers.entries()));
+    console.log('🔍 Facebook Image Upload Full Response Body:', JSON.stringify(imageResult, null, 2));
+    
+    if (!imageUploadResponse.ok) {
+      console.error('❌ Image upload error - Status:', imageUploadResponse.status);
+      console.error('❌ Image upload error - Response:', imageResult);
+      throw new Error(imageResult.error?.message || 'Failed to upload image to Facebook');
+    }
+
+    // 🔍 DEBUG: Log the extracted image hash
+    console.log('🔍 imageResult.images:', imageResult.images);
+    console.log('🔍 imageResult.images?.ad_image:', imageResult.images?.ad_image);
+    console.log('🔍 imageResult.hash:', imageResult.hash);
+    
+    // Fix: Facebook returns the hash in images[filename].hash structure
+    let imageHash = imageResult.images?.ad_image?.hash || imageResult.hash;
+    
+    // If the above doesn't work, try to get hash from the first image in the images object
+    if (!imageHash && imageResult.images) {
+      const imageKeys = Object.keys(imageResult.images);
+      console.log('🔍 Available image keys:', imageKeys);
+      if (imageKeys.length > 0) {
+        const firstImageKey = imageKeys[0];
+        imageHash = imageResult.images[firstImageKey]?.hash;
+        console.log('🔍 Found hash in images[' + firstImageKey + '].hash:', imageHash);
+      }
+    }
+    
+    console.log('🔍 Final extracted image hash:', imageHash);
+    
+    if (!imageHash) {
+      console.error('❌ No image hash found in Facebook response');
+      console.error('❌ Response status:', imageUploadResponse.status);
+      console.error('❌ Response body:', JSON.stringify(imageResult, null, 2));
+      throw new Error('No image hash returned from Facebook');
+    }
+
+    console.log('✅ Image uploaded successfully, hash:', imageHash);
+
     // Create ad creative
-    const creativeResponse = await fetch(`https://graph.facebook.com/v21.0/act_${import.meta.env.VITE_REACT_APP_FACEBOOK_AD_ACCOUNT_ID}/adcreatives`, {
+    const creativeResponse = await fetch(`https://graph.facebook.com/v21.0/${adAccountId}/adcreatives`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -146,7 +207,7 @@ export async function createFacebookAdCampaign(
           page_id: import.meta.env.VITE_REACT_APP_FACEBOOK_PAGE_ID,
           link_data: {
             message: campaignData.adText,
-            image_hash: campaignData.adImage, // This should be an image hash from Facebook
+            image_hash: imageHash, // Now using the actual hash from Facebook
             link: import.meta.env.VITE_REACT_APP_WEBSITE_URL || 'https://example.com'
           }
         },
@@ -164,7 +225,7 @@ export async function createFacebookAdCampaign(
     console.log('✅ Ad Creative created:', creativeId);
 
     // Create ad
-    const adResponse = await fetch(`https://graph.facebook.com/v21.0/act_${import.meta.env.VITE_REACT_APP_FACEBOOK_AD_ACCOUNT_ID}/ads`, {
+    const adResponse = await fetch(`https://graph.facebook.com/v21.0/${adAccountId}/ads`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -175,7 +236,7 @@ export async function createFacebookAdCampaign(
         creative: {
           creative_id: creativeId
         },
-        status: 'PAUSED',
+        status: 'ACTIVE',
         access_token: campaignData.accessToken
       })
     });
@@ -268,14 +329,13 @@ export async function createCustomFacebookAd(
   },
   campaignId?: string
 ): Promise<FacebookAdResponse> {
-  return createAutomaticFacebookAd(postId, {
+  return createAutomaticFacebookAd(postId, undefined, undefined, {
     dailyBudgetCents,
     targeting: {
       countries: targeting.countries,
       ageMin: targeting.ageMin,
       ageMax: targeting.ageMax,
       platforms: targeting.platforms
-    },
-    campaignId
+    }
   });
 }

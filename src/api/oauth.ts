@@ -44,7 +44,7 @@ export const OAUTH_CONFIG: OAuthConfig = {
   facebook: {
     clientId: import.meta.env.VITE_FACEBOOK_APP_ID || '',
     redirectUri: getRedirectUri('facebook'),
-    scope: 'public_profile,email,pages_manage_posts,pages_show_list,business_management,pages_read_engagement,instagram_basic',
+    scope: 'public_profile,email,pages_manage_posts,pages_manage_ads,pages_show_list,business_management,pages_read_engagement,instagram_basic,ads_management,ads_read,instagram_content_publish,instagram_manage_insights,catalog_management,leads_retrieval,pages_messaging,pages_messaging_subscriptions',
     authUrl: 'https://www.facebook.com/v8.0/dialog/oauth'
   }
 };

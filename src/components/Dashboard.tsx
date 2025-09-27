@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, User, BarChart3, Settings, Bell, Mail, Facebook, Instagram, Linkedin, Shield, Target, Activity, Clock, Zap, TrendingUp, Globe, Sparkles, Award, Rocket } from 'lucide-react';
+import { LogOut, BarChart3, Settings, Bell, Mail, Facebook, Instagram, Linkedin, Shield, Target, Activity, Clock, Zap, Globe, Sparkles, Award } from 'lucide-react';
 import AnalyticsTab from './AnalyticsTab';
 import SocialMediaDebugger from './SocialMediaDebugger';
 import HistoryTab from './HistoryTab';
+import ServiceLogos from './ServiceLogos';
 import { useAuth } from '../Contexts/AuthContext';
 import { logOut } from '../firebase/auth';
 import GlassPanel from './GlassPanel';
@@ -75,129 +76,149 @@ const Dashboard: React.FC = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6 flex items-center space-x-3">
+        <div className="mb-6 sm:mb-8 flex items-center space-x-3">
           <button aria-label="Overview"
             onClick={() => setActiveTab('main')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium border flex items-center space-x-2 transition-all duration-250 ${activeTab === 'main' ? 'bg-bg-alt border-border-turquoise shadow-sm shadow-turquoise text-text' : 'text-text-secondary hover:bg-bg-alt border-border hover:shadow-turquoise'}`}
+            className={`px-6 py-3 rounded-lg text-base font-medium border flex items-center space-x-3 transition-all duration-250 min-w-[140px] ${activeTab === 'main' ? 'bg-bg-alt border-border-turquoise shadow-sm shadow-turquoise text-text' : 'text-text-secondary hover:bg-bg-alt border-border hover:shadow-turquoise'}`}
           >
-            <Globe className="w-4 h-4" />
+            <Globe className="w-5 h-5" />
             <span>Overview</span>
           </button>
           <button aria-label="Analytics"
             onClick={() => setActiveTab('analytics')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium border flex items-center space-x-2 transition-colors ${activeTab === 'analytics' ? 'bg-bg-secondary border-border shadow-sm text-text' : 'text-text-secondary hover:bg-bg-secondary border-border'}`}
+            className={`px-6 py-3 rounded-lg text-base font-medium border flex items-center space-x-3 transition-colors min-w-[140px] ${activeTab === 'analytics' ? 'bg-bg-secondary border-border shadow-sm text-text' : 'text-text-secondary hover:bg-bg-secondary border-border'}`}
           >
-            <Activity className="w-4 h-4" />
+            <Activity className="w-5 h-5" />
             <span>Analytics</span>
           </button>
           <button aria-label="History"
             onClick={() => setActiveTab('history')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium border flex items-center space-x-2 transition-colors ${activeTab === 'history' ? 'bg-bg-secondary border-border shadow-sm text-text' : 'text-text-secondary hover:bg-bg-secondary border-border'}`}
+            className={`px-6 py-3 rounded-lg text-base font-medium border flex items-center space-x-3 transition-colors min-w-[140px] ${activeTab === 'history' ? 'bg-bg-secondary border-border shadow-sm text-text' : 'text-text-secondary hover:bg-bg-secondary border-border'}`}
           >
-            <Clock className="w-4 h-4" />
+            <Clock className="w-5 h-5" />
             <span>History</span>
           </button>
           <button aria-label="Debug"
             onClick={() => setActiveTab('debug')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium border flex items-center space-x-2 transition-colors ${activeTab === 'debug' ? 'bg-bg-secondary border-border shadow-sm text-text' : 'text-text-secondary hover:bg-bg-secondary border-border'}`}
+            className={`px-6 py-3 rounded-lg text-base font-medium border flex items-center space-x-3 transition-colors min-w-[140px] ${activeTab === 'debug' ? 'bg-bg-secondary border-border shadow-sm text-text' : 'text-text-secondary hover:bg-bg-secondary border-border'}`}
           >
-            <Zap className="w-4 h-4" />
+            <Zap className="w-5 h-5" />
             <span>Debug</span>
           </button>
         </div>
 
-        {activeTab === 'main' && (
-                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                   {/* Left Section - Social Media Platforms */}
-                   <GlassPanel variant="accent" className="animate-slide-in-left">
-                     <div className="glass-panel-content">
-                       <div className="glass-panel-header">
-                         <div className="flex items-center space-x-3 mb-2">
-                           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-turquoise">
-                             <Sparkles className="w-5 h-5 text-white" />
-                           </div>
-                           <h3 className="glass-panel-title text-xl font-bold">Content Creation</h3>
-                         </div>
-                         <p className="glass-panel-subtitle">Generate and publish content across social media platforms</p>
-                       </div>
-            <div className="space-y-4">
-              <button
-                onClick={handleFacebookClick}
-                className="w-full flex items-center justify-center space-x-3 bg-primary hover:bg-primary-dark text-white py-4 px-6 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong focus:ring-3 focus:ring-primary focus:ring-opacity-50"
-              >
-                <Facebook className="w-6 h-6" />
-                <span>Facebook Posts</span>
-              </button>
-              
-              <button
-                onClick={handleFacebookAdsClick}
-                className="w-full flex items-center justify-center space-x-3 bg-primary hover:bg-primary-dark text-white py-4 px-6 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong focus:ring-3 focus:ring-primary focus:ring-opacity-50"
-              >
-                <Target className="w-6 h-6" />
-                <span>Facebook Ads</span>
-              </button>
-              
-              <button
-                onClick={() => navigate('/instagram-content')}
-                className="w-full flex items-center justify-center space-x-3 bg-primary hover:bg-primary-dark text-white py-4 px-6 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong focus:ring-3 focus:ring-primary focus:ring-opacity-50"
-              >
-                <Instagram className="w-6 h-6" />
-                <span>Instagram</span>
-              </button>
-              
-              <button
-                onClick={() => navigate('/linkedin-content')}
-                className="w-full flex items-center justify-center space-x-3 bg-primary hover:bg-primary-dark text-white py-4 px-6 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong focus:ring-3 focus:ring-primary focus:ring-opacity-50"
-              >
-                <Linkedin className="w-6 h-6" />
-                <span>LinkedIn</span>
-              </button>
-                     </div>
-                   </div>
-                   </GlassPanel>
+        {/* Centered Headline */}
+        <div className="text-center mt-6 mb-6">
+          <h1 className="text-3xl font-bold text-[#1A3D5C]" style={{ fontFamily: 'Poppins, Inter, sans-serif' }}>
+            Marketing made simple, powerful, and yours.
+          </h1>
+          <p className="text-lg text-gray-600 mt-2" style={{ fontFamily: 'Poppins, Inter, sans-serif' }}>
+            AI-powered ads that save you time and maximize impact.
+          </p>
+        </div>
 
-                   {/* Right Section - Credential Management */}
-                   <GlassPanel variant="default" className="animate-slide-in-right">
-                     <div className="glass-panel-content">
-                       <div className="glass-panel-header">
-                         <div className="flex items-center space-x-3 mb-2">
-                           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-turquoise">
-                             <Shield className="w-5 h-5 text-white" />
+        {activeTab === 'main' && (
+                 <div className="space-y-6 sm:space-y-8">
+                   {/* Main Cards Row */}
+                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-8">
+                     {/* Left Section - Social Media Platforms */}
+                     <GlassPanel variant="accent" className="animate-slide-in-left">
+                       <div className="glass-panel-content">
+                         <div className="glass-panel-header">
+                           <div className="flex items-center space-x-2 mb-1">
+                             <div className="w-5 h-5 bg-primary rounded-lg flex items-center justify-center shadow-turquoise">
+                               <Sparkles className="w-3 h-3 text-white" />
+                             </div>
+                             <h3 className="glass-panel-title text-base font-bold">Content Creation</h3>
                            </div>
-                           <h3 className="glass-panel-title text-xl font-bold">Account Management</h3>
+                           <p className="glass-panel-subtitle text-xs">Generate and publish content across social media platforms</p>
                          </div>
-                         <p className="glass-panel-subtitle">Securely manage your social media credentials and API keys</p>
+              <div className="space-y-2">
+                <button
+                  onClick={handleFacebookClick}
+                  className="w-full flex items-center justify-center space-x-2 bg-primary hover:bg-primary-dark text-white py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong focus:ring-3 focus:ring-primary focus:ring-opacity-50"
+                >
+                  <Facebook className="w-4 h-4" />
+                  <span>Facebook Posts</span>
+                </button>
+                
+                <button
+                  onClick={handleFacebookAdsClick}
+                  className="w-full flex items-center justify-center space-x-2 bg-primary hover:bg-primary-dark text-white py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong focus:ring-3 focus:ring-primary focus:ring-opacity-50"
+                >
+                  <Target className="w-4 h-4" />
+                  <span>Facebook Ads</span>
+                </button>
+                
+                <button
+                  onClick={() => navigate('/instagram-content')}
+                  className="w-full flex items-center justify-center space-x-2 bg-primary hover:bg-primary-dark text-white py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong focus:ring-3 focus:ring-primary focus:ring-opacity-50"
+                >
+                  <Instagram className="w-4 h-4" />
+                  <span>Instagram</span>
+                </button>
+                
+                <button
+                  onClick={() => navigate('/linkedin-content')}
+                  className="w-full flex items-center justify-center space-x-2 bg-primary hover:bg-primary-dark text-white py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong focus:ring-3 focus:ring-primary focus:ring-opacity-50"
+                >
+                  <Linkedin className="w-4 h-4" />
+                  <span>LinkedIn</span>
+                </button>
                        </div>
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 shadow-turquoise hover:shadow-turquoise-strong transition-all duration-300 hover:scale-110">
-                  <Shield className="w-8 h-8 text-white" />
+                     </div>
+                     </GlassPanel>
+
+                     {/* Account Management Section */}
+                     <GlassPanel variant="default" className="animate-slide-in-right">
+                       <div className="glass-panel-content">
+                         <div className="glass-panel-header">
+                           <div className="flex items-center space-x-2 mb-1">
+                             <div className="w-5 h-5 bg-primary rounded-lg flex items-center justify-center shadow-turquoise">
+                               <Shield className="w-3 h-3 text-white" />
+                             </div>
+                             <h3 className="glass-panel-title text-base font-bold">Account Management</h3>
+                           </div>
+                           <p className="glass-panel-subtitle text-xs">Securely manage your social media credentials and API keys</p>
+                         </div>
+              <div className="space-y-3">
+                <div className="text-center">
+                  <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center mx-auto mb-2 shadow-turquoise hover:shadow-turquoise-strong transition-all duration-300 hover:scale-110">
+                    <Shield className="w-5 h-5 text-white" />
+                  </div>
+                  <p className="text-text-secondary mb-3 text-xs">
+                    Securely manage your social media credentials and API keys in one centralized location.
+                  </p>
                 </div>
-                <p className="text-text-secondary mb-6">
-                  Securely manage your social media credentials and API keys in one centralized location.
-                </p>
-              </div>
-              
-              <button
-                onClick={handleCredentialsClick}
-                className="w-full flex items-center justify-center space-x-3 bg-primary hover:bg-primary-dark text-white py-4 px-6 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong"
-              >
-                <Shield className="w-6 h-6" />
-                <span>Manage Credentials</span>
-              </button>
-              
-              <div className="bg-bg-alt border border-accent rounded-lg p-4 shadow-teal hover:shadow-teal-strong transition-all duration-250">
-                <div className="flex items-center space-x-2">
-                  <Award className="w-4 h-4 text-accent" />
-                  <span className="text-accent text-sm font-medium">Secure & Encrypted</span>
+                
+                <button
+                  onClick={handleCredentialsClick}
+                  className="w-full flex items-center justify-center space-x-2 bg-primary hover:bg-primary-dark text-white py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong"
+                >
+                  <Shield className="w-4 h-4" />
+                  <span>Manage Credentials</span>
+                </button>
+                
+                <div className="bg-bg-alt border border-accent rounded-lg p-2 shadow-teal hover:shadow-teal-strong transition-all duration-250">
+                  <div className="flex items-center space-x-2">
+                    <Award className="w-4 h-4 text-accent" />
+                    <span className="text-accent text-sm font-medium">Secure & Encrypted</span>
+                  </div>
+                  <p className="text-text-secondary text-sm mt-1">
+                    All credentials are encrypted and stored securely
+                  </p>
                 </div>
-                <p className="text-text-secondary text-sm mt-1">
-                  All credentials are encrypted and stored securely
-                </p>
-              </div>
+                       </div>
+                     </div>
+                     </GlassPanel>
+                   </div>
+
+                   {/* Service Partners Section */}
+                   <div className="mt-6 sm:mt-8">
+                     <div className="bg-white rounded-xl py-4">
+                       <ServiceLogos />
                      </div>
                    </div>
-                   </GlassPanel>
                  </div>
                  )}
 

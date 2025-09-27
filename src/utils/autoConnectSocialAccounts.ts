@@ -82,7 +82,7 @@ export async function handleSocialSignup(user: User): Promise<void> {
   }
 }
 
-// Enhanced Facebook sign-in that captures access token
+// Enhanced Facebook sign-in that captures access token and ads credentials
 export async function signInWithFacebookAndConnect(user: User, accessToken: string): Promise<{ success: boolean; error?: string }> {
   try {
     console.log('Auto-connecting Facebook account for user:', user.uid);
@@ -122,6 +122,88 @@ export async function signInWithFacebookAndConnect(user: User, accessToken: stri
         return { success: false, error: saveResult.error || 'Failed to save credentials' };
       }
 
+      // Now fetch and save Facebook Ads credentials
+      console.log('🚀 STARTING Facebook Ads credential extraction...');
+      console.log('🚀 DEBUG: About to fetch Facebook Ads credentials...');
+      console.log('🚀 FORCE CACHE REFRESH - VERSION 2.0');
+      try {
+        console.log('🔍 Fetching Facebook Ads credentials...');
+        console.log('🔍 Using access token:', accessToken.substring(0, 20) + '...');
+        
+        // Get ad accounts for the user
+        const adAccountsResponse = await fetch(`https://graph.facebook.com/v21.0/me/adaccounts?fields=id,name,account_status,currency&access_token=${accessToken}`);
+        const adAccountsData = await adAccountsResponse.json();
+
+        console.log('🔍 Ad accounts API response:', adAccountsResponse.status, adAccountsData);
+
+        if (adAccountsResponse.ok && adAccountsData.data && adAccountsData.data.length > 0) {
+          const firstAdAccount = adAccountsData.data[0];
+          console.log('Facebook Ad Account found:', firstAdAccount);
+
+          // Get campaigns for the ad account
+          let campaignId = null;
+          try {
+            // Fix double "act_" prefix issue - check if ID already has "act_" prefix
+            const adAccountId = firstAdAccount.id.startsWith('act_') ? firstAdAccount.id : `act_${firstAdAccount.id}`;
+            const campaignsResponse = await fetch(`https://graph.facebook.com/v21.0/${adAccountId}/campaigns?fields=id,name,status&limit=1&access_token=${accessToken}`);
+            const campaignsData = await campaignsResponse.json();
+
+            if (campaignsResponse.ok && campaignsData.data && campaignsData.data.length > 0) {
+              campaignId = campaignsData.data[0].id;
+              console.log('Existing campaign found:', campaignId);
+            } else {
+              // Create a default campaign if none exists
+              console.log('No existing campaigns found, will create one when needed');
+            }
+          } catch (campaignError) {
+            console.warn('Could not fetch campaigns:', campaignError);
+          }
+
+          // Save Facebook Ads credentials
+          const adsSaveResult = await saveCredential(user.uid, {
+            type: 'facebook_ads',
+            accessToken: accessToken, // Use the main access token for ads
+            adAccountId: firstAdAccount.id,
+            adAccountName: firstAdAccount.name,
+            currency: firstAdAccount.currency,
+            accountStatus: firstAdAccount.account_status,
+            pageId: firstPage.id, // Link to the page
+            pageName: firstPage.name,
+            campaignId: campaignId, // May be null if no campaigns exist yet
+            email: user.email || '',
+            displayName: user.displayName || '',
+            createdAt: new Date().toISOString(),
+            lastValidated: new Date().toISOString(),
+            isAutoConnected: true
+          });
+
+          if (adsSaveResult.success) {
+            console.log('Facebook Ads credentials saved successfully:', {
+              adAccountId: firstAdAccount.id,
+              adAccountName: firstAdAccount.name,
+              campaignId: campaignId
+            });
+          } else {
+            console.error('Failed to save Facebook Ads credentials:', adsSaveResult.error);
+          }
+        } else {
+          console.warn('⚠️ No Facebook Ad Accounts found or error fetching them:', adAccountsData);
+          console.warn('⚠️ This might be because:');
+          console.warn('⚠️ 1. User does not have a Facebook Ad Account');
+          console.warn('⚠️ 2. ads_management permission not granted');
+          console.warn('⚠️ 3. Facebook App does not have Marketing API access');
+          console.warn('⚠️ 4. User needs to grant permissions during login');
+        }
+      } catch (adsError) {
+        console.error('🚨 ERROR in Facebook Ads credential extraction:', adsError);
+        console.error('🚨 Full error details:', {
+          message: adsError.message,
+          stack: adsError.stack,
+          name: adsError.name
+        });
+        // Don't fail the entire process if ads credentials can't be fetched
+      }
+
       // Try to get Instagram business account
       try {
         const instagramResponse = await fetch(
@@ -156,6 +238,8 @@ export async function signInWithFacebookAndConnect(user: User, accessToken: stri
       } catch (instagramError) {
         console.warn('Could not auto-connect Instagram:', instagramError);
       }
+      
+      console.log('🚀 DEBUG: Instagram section completed, continuing...');
     } else {
       console.warn('No Facebook pages found for user');
     }

@@ -65,6 +65,17 @@ export const signInWithFacebook = async () => {
     provider.addScope('pages_read_engagement');
     provider.addScope('instagram_basic');
     
+    // CRITICAL: Add missing ads permissions for Facebook Ads functionality
+    provider.addScope('ads_management');        // Manage ad campaigns and creatives
+    provider.addScope('ads_read');             // Read ad account data and insights
+    provider.addScope('pages_manage_ads');     // Manage page-level ads
+    provider.addScope('instagram_content_publish'); // Publish to Instagram
+    provider.addScope('instagram_manage_insights'); // Instagram analytics
+    provider.addScope('catalog_management');   // Product catalog management
+    provider.addScope('leads_retrieval');      // Lead generation ads
+    provider.addScope('pages_messaging');      // Messenger ads
+    provider.addScope('pages_messaging_subscriptions'); // Messenger subscriptions
+    
     // Use popup for authentication (simpler user experience)
     const result = await signInWithPopup(auth, provider);
     

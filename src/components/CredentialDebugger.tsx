@@ -125,6 +125,17 @@ export default function CredentialDebugger() {
                         <p><strong>Display Name:</strong> {cred.displayName}</p>
                       </>
                     )}
+                    {cred.type === 'facebook_ads' && (
+                      <>
+                        <p><strong>Ad Account ID:</strong> {(cred as any).adAccountId}</p>
+                        <p><strong>Ad Account Name:</strong> {(cred as any).adAccountName}</p>
+                        <p><strong>Currency:</strong> {(cred as any).currency}</p>
+                        <p><strong>Page ID:</strong> {(cred as any).pageId}</p>
+                        {(cred as any).campaignId && (
+                          <p><strong>Campaign ID:</strong> {(cred as any).campaignId}</p>
+                        )}
+                      </>
+                    )}
                     <p><strong>Created:</strong> {cred.createdAt}</p>
                     <p><strong>Last Validated:</strong> {cred.lastValidated}</p>
                   </div>

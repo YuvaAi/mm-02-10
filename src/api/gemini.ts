@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Your Gemini API key
-const GEMINI_API_KEY = 'AIzaSyAVz6teqGhtIx8Bz8f2YGCQ3Q-GFHHgaec';
+const GEMINI_API_KEY = 'AIzaSyDJfR2HD8mEgsYwudaSevI43tpCY6tZ_0w';
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
@@ -30,7 +30,7 @@ export async function generatePostContent(prompt: string, category?: string): Pr
         throw new Error('Prompt cannot be empty');
       }
 
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
       const enhancedPrompt = `You are a professional social media content creator. Generate an engaging Facebook post based on the following:
 
@@ -99,7 +99,7 @@ export async function generateImageDescription(prompt: string, category?: string
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
       const imagePrompt = `You are an expert AI image generation specialist. Your task is to create a PRECISE, DETAILED image description that will generate an image EXACTLY matching the user's requirements.
 

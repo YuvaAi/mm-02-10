@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const GEMINI_API_KEY = 'AIzaSyCtS5cmAdBb1MDSSL6GsOGVWnZr5e89msQ';
+const GEMINI_API_KEY = 'AIzaSyDJfR2HD8mEgsYwudaSevI43tpCY6tZ_0w';
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 interface AdFormData {
@@ -19,7 +19,7 @@ interface AdResult {
 
 export async function generateFacebookAd(formData: AdFormData): Promise<AdResult> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     const prompt = `You are an expert Facebook Ads specialist. Create a high-converting Facebook ad based on these details:
 

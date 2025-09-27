@@ -1,0 +1,196 @@
+/**
+ * Country name to ISO 2-letter country code mapping
+ * Used for Facebook Ads API targeting
+ */
+
+export const COUNTRY_NAME_TO_CODE: Record<string, string> = {
+  'United States': 'US',
+  'Canada': 'CA',
+  'United Kingdom': 'GB',
+  'Australia': 'AU',
+  'Germany': 'DE',
+  'France': 'FR',
+  'Italy': 'IT',
+  'Spain': 'ES',
+  'Netherlands': 'NL',
+  'Belgium': 'BE',
+  'Switzerland': 'CH',
+  'Austria': 'AT',
+  'Sweden': 'SE',
+  'Norway': 'NO',
+  'Denmark': 'DK',
+  'Finland': 'FI',
+  'Ireland': 'IE',
+  'Portugal': 'PT',
+  'Poland': 'PL',
+  'Czech Republic': 'CZ',
+  'Hungary': 'HU',
+  'Romania': 'RO',
+  'Bulgaria': 'BG',
+  'Croatia': 'HR',
+  'Slovenia': 'SI',
+  'Slovakia': 'SK',
+  'Lithuania': 'LT',
+  'Latvia': 'LV',
+  'Estonia': 'EE',
+  'Greece': 'GR',
+  'Cyprus': 'CY',
+  'Malta': 'MT',
+  'Luxembourg': 'LU',
+  'Japan': 'JP',
+  'South Korea': 'KR',
+  'China': 'CN',
+  'India': 'IN',
+  'Brazil': 'BR',
+  'Mexico': 'MX',
+  'Argentina': 'AR',
+  'Chile': 'CL',
+  'Colombia': 'CO',
+  'Peru': 'PE',
+  'Venezuela': 'VE',
+  'Ecuador': 'EC',
+  'Uruguay': 'UY',
+  'Paraguay': 'PY',
+  'Bolivia': 'BO',
+  'South Africa': 'ZA',
+  'Egypt': 'EG',
+  'Nigeria': 'NG',
+  'Kenya': 'KE',
+  'Morocco': 'MA',
+  'Tunisia': 'TN',
+  'Algeria': 'DZ',
+  'Israel': 'IL',
+  'Turkey': 'TR',
+  'Russia': 'RU',
+  'Ukraine': 'UA',
+  'Belarus': 'BY',
+  'Kazakhstan': 'KZ',
+  'Uzbekistan': 'UZ',
+  'Thailand': 'TH',
+  'Vietnam': 'VN',
+  'Philippines': 'PH',
+  'Indonesia': 'ID',
+  'Malaysia': 'MY',
+  'Singapore': 'SG',
+  'Hong Kong': 'HK',
+  'Taiwan': 'TW',
+  'New Zealand': 'NZ',
+  'Saudi Arabia': 'SA',
+  'United Arab Emirates': 'AE',
+  'Qatar': 'QA',
+  'Kuwait': 'KW',
+  'Bahrain': 'BH',
+  'Oman': 'OM',
+  'Jordan': 'JO',
+  'Lebanon': 'LB',
+  'Iraq': 'IQ',
+  'Iran': 'IR',
+  'Pakistan': 'PK',
+  'Bangladesh': 'BD',
+  'Sri Lanka': 'LK',
+  'Nepal': 'NP',
+  'Bhutan': 'BT',
+  'Maldives': 'MV',
+  'Afghanistan': 'AF',
+  'Kyrgyzstan': 'KG',
+  'Tajikistan': 'TJ',
+  'Turkmenistan': 'TM',
+  'Mongolia': 'MN',
+  'North Korea': 'KP',
+  'Myanmar': 'MM',
+  'Cambodia': 'KH',
+  'Laos': 'LA',
+  'Brunei': 'BN',
+  'East Timor': 'TL',
+  'Papua New Guinea': 'PG',
+  'Fiji': 'FJ',
+  'Samoa': 'WS',
+  'Tonga': 'TO',
+  'Vanuatu': 'VU',
+  'Solomon Islands': 'SB',
+  'Palau': 'PW',
+  'Marshall Islands': 'MH',
+  'Micronesia': 'FM',
+  'Kiribati': 'KI',
+  'Tuvalu': 'TV',
+  'Nauru': 'NR',
+  'Cook Islands': 'CK',
+  'Niue': 'NU',
+  'Tokelau': 'TK',
+  'American Samoa': 'AS',
+  'Guam': 'GU',
+  'Northern Mariana Islands': 'MP',
+  'Puerto Rico': 'PR',
+  'Virgin Islands': 'VI',
+  'Bermuda': 'BM',
+  'Cayman Islands': 'KY',
+  'British Virgin Islands': 'VG',
+  'Anguilla': 'AI',
+  'Montserrat': 'MS',
+  'Saint Kitts and Nevis': 'KN',
+  'Antigua and Barbuda': 'AG',
+  'Dominica': 'DM',
+  'Saint Lucia': 'LC',
+  'Saint Vincent and the Grenadines': 'VC',
+  'Grenada': 'GD',
+  'Barbados': 'BB',
+  'Trinidad and Tobago': 'TT',
+  'Jamaica': 'JM',
+  'Haiti': 'HT',
+  'Dominican Republic': 'DO',
+  'Cuba': 'CU',
+  'Bahamas': 'BS',
+  'Belize': 'BZ',
+  'Costa Rica': 'CR',
+  'El Salvador': 'SV',
+  'Guatemala': 'GT',
+  'Honduras': 'HN',
+  'Nicaragua': 'NI',
+  'Panama': 'PA',
+  'Guyana': 'GY',
+  'Suriname': 'SR',
+  'French Guiana': 'GF',
+  'Greenland': 'GL',
+  'Iceland': 'IS',
+  'Faroe Islands': 'FO',
+  'Gibraltar': 'GI',
+  'Andorra': 'AD',
+  'Monaco': 'MC',
+  'San Marino': 'SM',
+  'Vatican City': 'VA',
+  'Liechtenstein': 'LI',
+  'Moldova': 'MD',
+  'Georgia': 'GE',
+  'Armenia': 'AM',
+  'Azerbaijan': 'AZ'
+};
+
+/**
+ * Convert country names to ISO 2-letter country codes
+ * @param countryNames - Array of country names
+ * @returns Array of 2-letter country codes
+ */
+export function convertCountryNamesToCodes(countryNames: string[]): string[] {
+  return countryNames.map(country => {
+    const code = COUNTRY_NAME_TO_CODE[country];
+    if (!code) {
+      console.warn(`Unknown country name: ${country}. Using as-is.`);
+      return country; // Fallback to original if not found
+    }
+    return code;
+  });
+}
+
+/**
+ * Convert a single country name to ISO 2-letter country code
+ * @param countryName - Country name
+ * @returns 2-letter country code
+ */
+export function convertCountryNameToCode(countryName: string): string {
+  const code = COUNTRY_NAME_TO_CODE[countryName];
+  if (!code) {
+    console.warn(`Unknown country name: ${countryName}. Using as-is.`);
+    return countryName; // Fallback to original if not found
+  }
+  return code;
+}
