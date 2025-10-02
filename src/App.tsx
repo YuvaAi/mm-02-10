@@ -8,6 +8,7 @@ import FacebookContent from './components/FacebookContent';
 import FacebookAdGenerator from './components/FacebookAdGenerator';
 import CredentialVault from './components/CredentialVault';
 import OAuthCallback from './components/OAuthCallback';
+import PopupOAuthCallback from './components/PopupOAuthCallback';
 import AuthDebugger from './components/AuthDebugger';
 import PrivateRoute from './components/PrivateRoute';
 
@@ -69,6 +70,10 @@ function App() {
           <Route 
             path="/oauth/:platform/callback" 
             element={<OAuthCallback />}
+          />
+          <Route 
+            path="/oauth/:platform/popup-callback" 
+            element={<PopupOAuthCallback />}
           />
           <Route 
             path="/auth-debug" 

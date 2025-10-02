@@ -1,4 +1,4 @@
-import { collection, doc, setDoc, getDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { collection, doc, setDoc, getDoc, query, where, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
 import { UserCredentials } from './types';
 
@@ -17,12 +17,12 @@ export const saveCredential = async (
     const dataToSave = {
       ...credentialData,
       userId,
-      updatedAt: serverTimestamp()
+      updatedAt: new Date().toISOString()
     };
     
     // Only set createdAt if it's not already provided
     if (!credentialData.createdAt) {
-      dataToSave.createdAt = serverTimestamp();
+      dataToSave.createdAt = new Date().toISOString();
     }
     
     console.log('Saving credential data:', dataToSave);
@@ -45,7 +45,10 @@ export const getCredential = async (userId: string, platform: string) => {
     const credentialSnap = await getDoc(credentialRef);
     
     if (credentialSnap.exists()) {
-      return { success: true, data: credentialSnap.data(), error: null };
+      const rawData = credentialSnap.data();
+      // Convert any Firestore timestamps to ISO strings
+      const convertedData = convertTimestamps(rawData);
+      return { success: true, data: convertedData, error: null };
     } else {
       return { success: false, data: null, error: 'No credentials found' };
     }
@@ -53,6 +56,36 @@ export const getCredential = async (userId: string, platform: string) => {
     const firestoreError = error as Error;
     return { success: false, data: null, error: firestoreError.message };
   }
+};
+
+// Helper function to convert Firestore timestamps to ISO strings
+const convertTimestamps = (obj: any): any => {
+  if (obj === null || obj === undefined) return obj;
+  
+  if (typeof obj === 'object') {
+    // Check if it's a Firestore timestamp object
+    if (obj.seconds !== undefined && obj.nanoseconds !== undefined) {
+      // Convert Firestore timestamp to ISO string
+      const date = new Date(obj.seconds * 1000 + obj.nanoseconds / 1000000);
+      return date.toISOString();
+    }
+    
+    // If it's an array, convert each element
+    if (Array.isArray(obj)) {
+      return obj.map(convertTimestamps);
+    }
+    
+    // If it's a regular object, convert each property
+    const converted: any = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        converted[key] = convertTimestamps(obj[key]);
+      }
+    }
+    return converted;
+  }
+  
+  return obj;
 };
 
 export const getCredentials = async (userId: string) => {
@@ -64,7 +97,10 @@ export const getCredentials = async (userId: string) => {
     
     const credentials: UserCredentials[] = [];
     querySnapshot.forEach((doc) => {
-      credentials.push({ id: doc.id, ...doc.data() } as UserCredentials);
+      const rawData = doc.data();
+      // Convert any Firestore timestamps to ISO strings
+      const convertedData = convertTimestamps(rawData);
+      credentials.push({ id: doc.id, ...convertedData } as UserCredentials);
     });
     
     return { success: true, data: credentials, error: null };

@@ -1,6 +1,8 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { createAdSetAndAd, createFacebookAdCampaign, createNewCampaignFunction as createNewCampaignHandler } from './facebookAds';
+import { exchangeLinkedInCode } from './linkedinOAuth';
+import { publishLinkedInPost } from './linkedinPost';
 
 admin.initializeApp();
 
@@ -16,3 +18,9 @@ export const createFacebookAdCampaignFunction = functions.https.onCall(async (re
 export const createNewCampaignFunction = functions.https.onCall(async (request) => {
   return await createNewCampaignHandler(request.data, { auth: request.auth });
 });
+
+// LinkedIn OAuth function
+export { exchangeLinkedInCode };
+
+// LinkedIn posting function
+export { publishLinkedInPost };

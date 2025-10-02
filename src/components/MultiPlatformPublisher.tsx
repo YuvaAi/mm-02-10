@@ -190,9 +190,10 @@ const MultiPlatformPublisher: React.FC<MultiPlatformPublisherProps> = ({
         case 'linkedin':
           result = await publishToLinkedIn(
             content,
-            credentials.linkedInUserId || '',
+            credentials.linkedInPageId || credentials.linkedInUserId || '',
             credentials.accessToken,
-            mediaFiles
+            mediaFiles,
+            credentials.hasOrganizationPages || false
           );
           break;
         default:

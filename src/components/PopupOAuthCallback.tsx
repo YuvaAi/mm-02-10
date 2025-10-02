@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { FacebookOAuthService, LinkedInOAuthService } from '../api/oauth';
 import { useAuth } from '../Contexts/AuthContext';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 
-const OAuthCallback: React.FC = () => {
+const PopupOAuthCallback: React.FC = () => {
   const { platform } = useParams<{ platform: string }>();
-  const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Processing authentication...');
@@ -14,85 +13,7 @@ const OAuthCallback: React.FC = () => {
   useEffect(() => {
     const handleOAuthCallback = async () => {
       try {
-        if (platform === 'facebook') {
-          // For Facebook implicit flow, check URL fragment for access token
-          const hash = window.location.hash.substring(1);
-          const urlParams = new URLSearchParams(hash);
-          const accessToken = urlParams.get('access_token');
-          const state = urlParams.get('state');
-          const error = urlParams.get('error');
-
-          if (error) {
-            setStatus('error');
-            setMessage(`Authentication failed: ${error}`);
-            return;
-          }
-
-          if (!accessToken || !state) {
-            setStatus('error');
-            setMessage('Missing authentication parameters');
-            return;
-          }
-          const result = await FacebookOAuthService.handleCallback(accessToken, state);
-          
-          if (result.success && result.accessToken) {
-            // Store tokens securely
-            FacebookOAuthService.storeTokens({
-              accessToken: result.accessToken,
-              expiresIn: result.expiresIn || 3600,
-              tokenType: 'Bearer',
-              scope: 'public_profile,email,pages_manage_posts,ads_management,ads_read'
-            }, result.userInfo);
-
-            // Store access token in session storage for auto-connect
-            sessionStorage.setItem('facebook_access_token', result.accessToken);
-
-            // Auto-connect accounts - try both with current user and with a delay
-            const attemptAutoConnect = async (user: any) => {
-              try {
-                // Import and call the auto-connect function
-                const { signInWithFacebookAndConnect } = await import('../utils/autoConnectSocialAccounts');
-                const connectResult = await signInWithFacebookAndConnect(user, result.accessToken);
-                
-                if (connectResult.success) {
-                  console.log('Facebook accounts auto-connected successfully');
-                } else {
-                  console.warn('Facebook auto-connect failed:', connectResult.error);
-                }
-              } catch (connectError) {
-                console.warn('Error during Facebook auto-connect:', connectError);
-              }
-            };
-
-            // Try immediately if user is available
-            if (currentUser) {
-              await attemptAutoConnect(currentUser);
-            } else {
-              // If user is not available yet, wait a bit and try again
-              console.log('User not authenticated yet, waiting for authentication...');
-              setTimeout(async () => {
-                // Check if user is now available
-                const { currentUser: delayedUser } = useAuth();
-                if (delayedUser) {
-                  await attemptAutoConnect(delayedUser);
-                } else {
-                  console.warn('User still not authenticated after delay, auto-connect will be handled by SocialLoginButtons');
-                }
-              }, 2000);
-            }
-
-            setStatus('success');
-            setMessage('Successfully connected to Facebook! All credentials have been saved.');
-            
-            // Redirect to dashboard after a short delay
-            setTimeout(() => {
-              navigate('/dashboard');
-            }, 2000);
-          } else {
-            setStatus('error');
-            setMessage(result.error || 'Authentication failed');
-          }
-        } else if (platform === 'linkedin') {
+        if (platform === 'linkedin') {
           // For LinkedIn authorization code flow, check URL search params
           const urlParams = new URLSearchParams(window.location.search);
           const code = urlParams.get('code');
@@ -103,18 +24,42 @@ const OAuthCallback: React.FC = () => {
           if (error) {
             setStatus('error');
             setMessage(`LinkedIn authentication failed: ${errorDescription || error}`);
+            
+            // Send error message to parent window
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'LINKEDIN_OAUTH_ERROR',
+                error: errorDescription || error
+              }, window.location.origin);
+            }
             return;
           }
 
           if (!code || !state) {
             setStatus('error');
             setMessage('Missing LinkedIn authentication parameters. Please try again.');
+            
+            // Send error message to parent window
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'LINKEDIN_OAUTH_ERROR',
+                error: 'Missing authentication parameters'
+              }, window.location.origin);
+            }
             return;
           }
 
           if (!currentUser) {
             setStatus('error');
             setMessage('User not authenticated. Please login first.');
+            
+            // Send error message to parent window
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'LINKEDIN_OAUTH_ERROR',
+                error: 'User not authenticated'
+              }, window.location.origin);
+            }
             return;
           }
 
@@ -149,37 +94,59 @@ const OAuthCallback: React.FC = () => {
               }
             };
 
-            // Only attempt auto-connect if we have a valid access token
-            if (result.accessToken) {
-              await attemptAutoConnect(currentUser);
-            } else {
-              console.warn('No access token available for LinkedIn auto-connect');
-            }
+            await attemptAutoConnect(currentUser);
 
             setStatus('success');
             setMessage('Successfully connected to LinkedIn! All credentials have been saved.');
             
-            // Redirect to dashboard after a short delay
-            setTimeout(() => {
-              navigate('/dashboard');
-            }, 2000);
+            // Send success message to parent window
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'LINKEDIN_OAUTH_SUCCESS',
+                result: result
+              }, window.location.origin);
+            }
           } else {
             setStatus('error');
             setMessage(result.error || 'Authentication failed');
+            
+            // Send error message to parent window
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'LINKEDIN_OAUTH_ERROR',
+                error: result.error || 'Authentication failed'
+              }, window.location.origin);
+            }
           }
         } else {
           setStatus('error');
           setMessage('Unsupported platform');
+          
+          // Send error message to parent window
+          if (window.opener) {
+            window.opener.postMessage({
+              type: 'LINKEDIN_OAUTH_ERROR',
+              error: 'Unsupported platform'
+            }, window.location.origin);
+          }
         }
       } catch (error) {
         console.error('OAuth callback error:', error);
         setStatus('error');
         setMessage('An unexpected error occurred');
+        
+        // Send error message to parent window
+        if (window.opener) {
+          window.opener.postMessage({
+            type: 'LINKEDIN_OAUTH_ERROR',
+            error: 'An unexpected error occurred'
+          }, window.location.origin);
+        }
       }
     };
 
     handleOAuthCallback();
-  }, [platform, navigate, currentUser]);
+  }, [platform, currentUser]);
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
@@ -209,17 +176,14 @@ const OAuthCallback: React.FC = () => {
           
           {status === 'success' && (
             <p className="text-sm text-gray-500">
-              Redirecting to dashboard...
+              You can close this window now.
             </p>
           )}
           
           {status === 'error' && (
-            <button
-              onClick={() => navigate('/login')}
-              className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-colors"
-            >
-              Try Again
-            </button>
+            <p className="text-sm text-gray-500">
+              You can close this window and try again.
+            </p>
           )}
         </div>
       </div>
@@ -227,4 +191,4 @@ const OAuthCallback: React.FC = () => {
   );
 };
 
-export default OAuthCallback;
+export default PopupOAuthCallback;

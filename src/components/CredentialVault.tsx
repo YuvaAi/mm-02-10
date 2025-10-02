@@ -10,6 +10,7 @@ import CredentialDebugger from './CredentialDebugger';
 import GlassPanel from './GlassPanel';
 import { OAuthTokenService, isOAuthAvailable } from '../services/oauthTokenService';
 import { isOAuthConfigured } from '../api/oauth';
+import OAuthLoginButtons from './OAuthLoginButtons';
 
 interface FacebookPage {
   id: string;
@@ -434,8 +435,8 @@ const CredentialVault: React.FC = () => {
             </GlassPanel>
           )}
 
-          {/* OAuth Quick Connect Section - Removed */}
-          {false && (
+          {/* OAuth Quick Connect Section */}
+          {true && (
             <GlassPanel variant="purple" className="animate-slide-in-left">
               <div className="glass-panel-content">
                 <div className="glass-panel-header">

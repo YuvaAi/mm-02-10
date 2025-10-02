@@ -33,10 +33,14 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createNewCampaignFunction = exports.createFacebookAdCampaignFunction = exports.createFacebookAd = void 0;
+exports.publishLinkedInPost = exports.exchangeLinkedInCode = exports.createNewCampaignFunction = exports.createFacebookAdCampaignFunction = exports.createFacebookAd = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const facebookAds_1 = require("./facebookAds");
+const linkedinOAuth_1 = require("./linkedinOAuth");
+Object.defineProperty(exports, "exchangeLinkedInCode", { enumerable: true, get: function () { return linkedinOAuth_1.exchangeLinkedInCode; } });
+const linkedinPost_1 = require("./linkedinPost");
+Object.defineProperty(exports, "publishLinkedInPost", { enumerable: true, get: function () { return linkedinPost_1.publishLinkedInPost; } });
 admin.initializeApp();
 // Wrap your custom functions so they match Firebase's Callable function signature
 exports.createFacebookAd = functions.https.onCall(async (request) => {

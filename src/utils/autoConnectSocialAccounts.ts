@@ -276,3 +276,90 @@ export async function autoConnectFacebookAccount(user: User): Promise<{ success:
     return { success: false, error: err.message };
   }
 }
+
+// Enhanced LinkedIn sign-in that captures access token and saves credentials
+// NOTE: The backend Firebase function already handles profile fetching and credential saving
+// This function is kept for backward compatibility and logging purposes
+export async function signInWithLinkedInAndConnect(user: User, accessToken: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    console.log('Auto-connecting LinkedIn account for user:', user.uid);
+    console.log('LinkedIn credentials already saved by backend function');
+    
+    // The backend Firebase function (exchangeLinkedInCode) already:
+    // 1. Fetched the LinkedIn profile
+    // 2. Fetched organization pages
+    // 3. Saved all credentials to Firestore
+    // So we don't need to do anything here except confirm success
+    
+    return { success: true };
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error('Error in LinkedIn auto-connect:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+// Auto-connect LinkedIn account when user signs up with LinkedIn
+export async function autoConnectLinkedInAccount(user: User): Promise<{ success: boolean; error?: string }> {
+  try {
+    console.log('autoConnectLinkedInAccount called for user:', user.uid);
+    
+    // Get stored LinkedIn access token
+    const accessToken = sessionStorage.getItem('linkedin_access_token');
+    console.log('LinkedIn access token from session storage:', accessToken ? 'Found' : 'Not found');
+    
+    if (!accessToken) {
+      console.warn('No LinkedIn access token found in session storage');
+      return { success: false, error: 'No LinkedIn access token available' };
+    }
+
+    // Use the enhanced function with the access token
+    const result = await signInWithLinkedInAndConnect(user, accessToken);
+    console.log('signInWithLinkedInAndConnect result:', result);
+    return result;
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error('Error in autoConnectLinkedInAccount:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+// Check if LinkedIn is already connected and handle reconnection
+export async function checkLinkedInConnection(user: User): Promise<{ success: boolean; error?: string; isConnected?: boolean }> {
+  try {
+    console.log('Checking LinkedIn connection for user:', user.uid);
+    
+    // Import getCredential function
+    const { getCredential } = await import('../firebase/firestore');
+    
+    // Check if LinkedIn credentials already exist
+    const credentialResult = await getCredential(user.uid, 'linkedin');
+    
+    if (credentialResult.success && credentialResult.data) {
+      console.log('LinkedIn credentials found:', credentialResult.data);
+      
+      // Check if the access token is still valid
+      const { validateLinkedInCredentials } = await import('../api/linkedin');
+      const validationResult = await validateLinkedInCredentials(
+        credentialResult.data.accessToken,
+        credentialResult.data.linkedInPageId,
+        credentialResult.data.hasOrganizationPages
+      );
+      
+      if (validationResult.success) {
+        console.log('LinkedIn connection is still valid');
+        return { success: true, isConnected: true };
+      } else {
+        console.log('LinkedIn connection expired, needs reconnection');
+        return { success: true, isConnected: false };
+      }
+    } else {
+      console.log('No LinkedIn credentials found');
+      return { success: true, isConnected: false };
+    }
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error('Error checking LinkedIn connection:', err);
+    return { success: false, error: err.message };
+  }
+}
