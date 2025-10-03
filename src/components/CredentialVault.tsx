@@ -32,6 +32,11 @@ const CredentialVault: React.FC = () => {
   const [availablePages, setAvailablePages] = useState<FacebookPage[]>([]);
   const [, setSavedCredentials] = useState<UserCredentials[]>([]);
   
+  // Facebook OAuth extracted data state
+  const [facebookOAuthData, setFacebookOAuthData] = useState<any>(null);
+  const [facebookAdsData, setFacebookAdsData] = useState<any>(null);
+  const [instagramOAuthData, setInstagramOAuthData] = useState<any>(null);
+  
   // Instagram state
   const [instagramAccessToken, setInstagramAccessToken] = useState('');
   const [instagramUserId, setInstagramUserId] = useState('');
@@ -94,7 +99,12 @@ const CredentialVault: React.FC = () => {
         setAdsAccessToken((adsCred as any).accessToken || '');
         setAdsAccountId((adsCred as any).adAccountId || '');
         setAdsCampaignId((adsCred as any).campaignId || '');
+        setFacebookAdsData(adsCred);
       }
+      
+      // Set OAuth extracted data for display
+      setFacebookOAuthData(facebookCred);
+      setInstagramOAuthData(instagramCred);
     } catch (error) {
       console.error('Error loading credentials:', error);
     }
@@ -430,6 +440,136 @@ const CredentialVault: React.FC = () => {
                       }
                     </p>
                   </div>
+                </div>
+              </div>
+            </GlassPanel>
+          )}
+
+          {/* OAuth Extracted Data Display */}
+          {(facebookOAuthData || facebookAdsData || instagramOAuthData) && (
+            <GlassPanel variant="accent" className="animate-slide-in-left">
+              <div className="glass-panel-content">
+                <div className="glass-panel-header">
+                  <div className="flex items-center mb-4">
+                    <CheckCircle className="w-6 h-6 text-green-500 mr-2 icon-glow" />
+                    <h2 className="glass-panel-title text-xl font-semibold">OAuth Extracted Credentials</h2>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  {/* Facebook OAuth Data */}
+                  {facebookOAuthData && (
+                    <div className="bg-bg border border-success rounded-lg p-4">
+                      <h3 className="font-semibold text-text mb-3 flex items-center">
+                        <div className="w-8 h-8 bg-[#1877F2] rounded-full flex items-center justify-center mr-3">
+                          <span className="text-white font-bold text-sm">f</span>
+                        </div>
+                        Facebook Page Credentials
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-text-secondary">Page ID:</span>
+                          <span className="ml-2 font-mono text-text">{facebookOAuthData.pageId}</span>
+                        </div>
+                        <div>
+                          <span className="text-text-secondary">Page Name:</span>
+                          <span className="ml-2 text-text">{facebookOAuthData.pageName}</span>
+                        </div>
+                        <div>
+                          <span className="text-text-secondary">User ID:</span>
+                          <span className="ml-2 font-mono text-text">{facebookOAuthData.userId}</span>
+                        </div>
+                        <div>
+                          <span className="text-text-secondary">Email:</span>
+                          <span className="ml-2 text-text">{facebookOAuthData.email}</span>
+                        </div>
+                        <div>
+                          <span className="text-text-secondary">Has Pages:</span>
+                          <span className="ml-2 text-text">{facebookOAuthData.hasPages ? 'Yes' : 'No'}</span>
+                        </div>
+                        <div>
+                          <span className="text-text-secondary">Can Post:</span>
+                          <span className="ml-2 text-text">{facebookOAuthData.canPost ? 'Yes' : 'No'}</span>
+                        </div>
+                      </div>
+                      {facebookOAuthData.pages && facebookOAuthData.pages.length > 0 && (
+                        <div className="mt-3">
+                          <span className="text-text-secondary text-sm">Available Pages:</span>
+                          <div className="mt-1 space-y-1">
+                            {facebookOAuthData.pages.map((page: any, index: number) => (
+                              <div key={index} className="text-xs bg-bg-alt p-2 rounded border">
+                                <span className="font-mono">{page.id}</span> - {page.name}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Facebook Ads Data */}
+                  {facebookAdsData && (
+                    <div className="bg-bg border border-error rounded-lg p-4">
+                      <h3 className="font-semibold text-text mb-3 flex items-center">
+                        <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-600 rounded-full flex items-center justify-center mr-3">
+                          <span className="text-white font-bold text-sm">$</span>
+                        </div>
+                        Facebook Ads Credentials
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-text-secondary">Ad Account ID:</span>
+                          <span className="ml-2 font-mono text-text">{facebookAdsData.adAccountId}</span>
+                        </div>
+                        <div>
+                          <span className="text-text-secondary">Ad Account Name:</span>
+                          <span className="ml-2 text-text">{facebookAdsData.adAccountName}</span>
+                        </div>
+                        <div>
+                          <span className="text-text-secondary">Currency:</span>
+                          <span className="ml-2 text-text">{facebookAdsData.currency}</span>
+                        </div>
+                        <div>
+                          <span className="text-text-secondary">Account Status:</span>
+                          <span className="ml-2 text-text">{facebookAdsData.accountStatus}</span>
+                        </div>
+                        <div>
+                          <span className="text-text-secondary">Can Create Ads:</span>
+                          <span className="ml-2 text-text">{facebookAdsData.canCreateAds ? 'Yes' : 'No'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Instagram OAuth Data */}
+                  {instagramOAuthData && (
+                    <div className="bg-bg border border-accent rounded-lg p-4">
+                      <h3 className="font-semibold text-text mb-3 flex items-center">
+                        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mr-3">
+                          <span className="text-white font-bold text-sm">📷</span>
+                        </div>
+                        Instagram Business Credentials
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-text-secondary">Instagram User ID:</span>
+                          <span className="ml-2 font-mono text-text">{instagramOAuthData.instagramUserId}</span>
+                        </div>
+                        <div>
+                          <span className="text-text-secondary">Username:</span>
+                          <span className="ml-2 text-text">@{instagramOAuthData.username}</span>
+                        </div>
+                        <div>
+                          <span className="text-text-secondary">Page ID:</span>
+                          <span className="ml-2 font-mono text-text">{instagramOAuthData.pageId}</span>
+                        </div>
+                        <div>
+                          <span className="text-text-secondary">Can Post:</span>
+                          <span className="ml-2 text-text">{instagramOAuthData.canPost ? 'Yes' : 'No'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </GlassPanel>

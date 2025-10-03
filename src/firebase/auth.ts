@@ -1,6 +1,4 @@
-import { initializeApp } from 'firebase/app';
 import { 
-  getAuth, 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword as firebaseSignIn,
   signInWithPopup,
@@ -8,14 +6,10 @@ import {
   FacebookAuthProvider,
   signOut,
   onAuthStateChanged,
-  User,
-  FirebaseError
+  User
 } from 'firebase/auth';
-import firebaseConfig from './config';
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+import { FirebaseError } from 'firebase/app';
+import { auth } from './firebase';
 
 // Authentication functions
 export const signUpWithEmailAndPassword = async (email: string, password: string) => {

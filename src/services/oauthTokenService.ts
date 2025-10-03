@@ -1,5 +1,4 @@
 // OAuth Token Service - Automatic token management
-import { FacebookOAuthService } from '../api/oauth';
 import { saveCredential, getCredentials } from '../firebase/firestore';
 import { UserCredentials } from '../firebase/types';
 
@@ -14,37 +13,27 @@ export class OAuthTokenService {
   // Get Facebook access token automatically
   static async getFacebookToken(): Promise<AutoTokenResult> {
     try {
-      const tokens = FacebookOAuthService.getStoredTokens();
+      // Check session storage for Facebook access token
+      const accessToken = sessionStorage.getItem('facebook_access_token');
       
-      if (!tokens) {
+      if (!accessToken) {
         return {
           success: false,
-          error: 'No Facebook OAuth tokens found. Please login with Facebook first.',
-          platform: 'facebook'
-        };
-      }
-
-      // Check if token is expired
-      const expirationTime = localStorage.getItem('facebook_oauth_expires');
-      if (expirationTime && Date.now() > parseInt(expirationTime)) {
-        FacebookOAuthService.clearTokens();
-        return {
-          success: false,
-          error: 'Facebook OAuth token has expired. Please login again.',
+          error: 'No Facebook access token found. Please login with Facebook first.',
           platform: 'facebook'
         };
       }
 
       return {
         success: true,
-        accessToken: tokens.accessToken,
+        accessToken: accessToken,
         platform: 'facebook'
       };
-    } catch (error) {
-      console.error('Error getting Facebook token:', error);
+    } catch (error: unknown) {
+      const err = error as Error;
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to get Facebook token',
+        error: err.message || 'Failed to get Facebook token',
         platform: 'facebook'
       };
     }
@@ -105,12 +94,12 @@ export class OAuthTokenService {
 
   // Check if user has OAuth tokens
   static hasOAuthTokens(): boolean {
-    return FacebookOAuthService.isAuthenticated();
+    return !!sessionStorage.getItem('facebook_access_token');
   }
 
   // Clear all OAuth tokens
   static clearAllOAuthTokens(): void {
-    FacebookOAuthService.clearTokens();
+    sessionStorage.removeItem('facebook_access_token');
     // Clear other platform tokens as needed
   }
 

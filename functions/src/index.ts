@@ -2,7 +2,9 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { createAdSetAndAd, createFacebookAdCampaign, createNewCampaignFunction as createNewCampaignHandler } from './facebookAds';
 import { exchangeLinkedInCode } from './linkedinOAuth';
+import { exchangeFacebookCode } from './facebookOAuth';
 import { publishLinkedInPost } from './linkedinPost';
+import { fetchAnalyticsData } from './analytics';
 
 admin.initializeApp();
 
@@ -22,5 +24,13 @@ export const createNewCampaignFunction = functions.https.onCall(async (request) 
 // LinkedIn OAuth function
 export { exchangeLinkedInCode };
 
+// Facebook OAuth function
+export { exchangeFacebookCode };
+
 // LinkedIn posting function
 export { publishLinkedInPost };
+
+// Analytics function
+export const fetchAnalyticsDataFunction = functions.https.onCall(async (request) => {
+  return await fetchAnalyticsData(request.data, { auth: request.auth });
+});

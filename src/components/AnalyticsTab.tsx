@@ -15,6 +15,7 @@ import {
   PlatformComparison,
   TrendingPost
 } from '../api/analytics';
+import { AnalyticsService } from '../services/analyticsService';
 import GlassPanel from './GlassPanel';
 import {
   ResponsiveContainer,
@@ -77,6 +78,22 @@ const AnalyticsTab: React.FC = () => {
       setError(null);
       
       try {
+        // First, try to get cached analytics data
+        console.log('🔍 Analytics: Checking for cached analytics data...');
+        const cachedMetrics = await AnalyticsService.getCachedAnalytics(currentUser.uid);
+        
+        if (cachedMetrics.length > 0) {
+          console.log('🔍 Analytics: Found cached metrics:', cachedMetrics.length);
+          setMetrics(cachedMetrics);
+          setDebugInfo({
+            postsCount: cachedMetrics.length,
+            credentialsCount: 0,
+            posts: cachedMetrics.slice(0, 3),
+            credentials: [],
+            source: 'cache'
+          });
+        }
+
         // Fetch published posts and credentials
         console.log('🔍 Analytics: Fetching published posts and credentials...');
         const [posts, creds] = await Promise.all([
@@ -92,27 +109,37 @@ const AnalyticsTab: React.FC = () => {
           postsCount: posts.length,
           credentialsCount: Object.keys(creds).length,
           posts: posts.slice(0, 3), // First 3 posts for debugging
-          credentials: Object.keys(creds)
+          credentials: Object.keys(creds),
+          source: cachedMetrics.length > 0 ? 'cache' : 'live'
         });
 
         if (posts.length === 0) {
           console.log('🔍 Analytics: No published posts found');
-          setMetrics([]);
+          if (cachedMetrics.length === 0) {
+            setMetrics([]);
+          }
           setLoading(false);
           return;
         }
 
-        // Process all posts to get metrics using the comprehensive function
-        console.log('🔍 Analytics: Processing posts for metrics...');
+        // Process all posts to get metrics using the enhanced function
+        console.log('🔍 Analytics: Processing posts for live metrics...');
         const results = await fetchAllPlatformMetrics(currentUser.uid, posts, creds);
         console.log('🔍 Analytics: Final metrics results:', results.length, 'valid metrics');
         console.log('🔍 Analytics: Sample metrics:', results.slice(0, 2));
         
-        setMetrics(results);
-        
-        if (results.length === 0) {
-          console.log('🔍 Analytics: No valid metrics found after processing');
+        // Use live data if we got results, otherwise keep cached data
+        if (results.length > 0) {
+          setMetrics(results);
+          console.log('🔍 Analytics: Using live metrics data');
+        } else if (cachedMetrics.length > 0) {
+          console.log('🔍 Analytics: Using cached metrics data');
+        } else {
+          console.log('🔍 Analytics: No metrics data available');
         }
+        
+        // Clean up old cached data
+        await AnalyticsService.clearOldAnalytics(currentUser.uid, 30);
         
       } catch (e: unknown) {
         const err = e as Error;
@@ -192,7 +219,7 @@ const AnalyticsTab: React.FC = () => {
         <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-semibold text-gray-800">{`${label}`}</p>
           {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
+            <p key={index} className="text-sm" data-color={entry.color}>
               {`${entry.name}: ${entry.value.toLocaleString()}`}
             </p>
           ))}
@@ -204,11 +231,55 @@ const AnalyticsTab: React.FC = () => {
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
+  // Refresh analytics data
+  const handleRefresh = async () => {
+    if (!currentUser) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      console.log('🔄 Refreshing analytics data...');
+      
+      // Fetch fresh data
+      const [posts, creds] = await Promise.all([
+        getPublishedPosts(currentUser.uid),
+        getCredentialsMap(currentUser.uid),
+      ]);
+      
+      if (posts.length === 0) {
+        setMetrics([]);
+        setLoading(false);
+        return;
+      }
+      
+      const results = await fetchAllPlatformMetrics(currentUser.uid, posts, creds);
+      setMetrics(results);
+      
+      console.log('✅ Analytics data refreshed:', results.length, 'metrics');
+    } catch (error) {
+      console.error('Error refreshing analytics:', error);
+      setError('Failed to refresh analytics data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Debug panel for development
   const DebugPanel = () => (
     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-      <h4 className="font-semibold text-yellow-800 mb-2">🔍 Debug Information</h4>
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="font-semibold text-yellow-800">🔍 Debug Information</h4>
+        <button
+          onClick={handleRefresh}
+          disabled={loading}
+          className="px-3 py-1 text-xs bg-yellow-200 hover:bg-yellow-300 rounded transition-colors disabled:opacity-50"
+        >
+          {loading ? 'Refreshing...' : 'Refresh Data'}
+        </button>
+      </div>
       <div className="text-sm text-yellow-700 space-y-1">
+        <p>Data source: <span className="font-medium">{debugInfo.source || 'unknown'}</span></p>
         <p>Posts found: {debugInfo.postsCount || 0}</p>
         <p>Credentials found: {debugInfo.credentialsCount || 0}</p>
         <p>Metrics processed: {metrics.length}</p>
@@ -216,10 +287,20 @@ const AnalyticsTab: React.FC = () => {
         <p>Platform comparisons: {platformComparison.length}</p>
         <p>Trending posts: {trendingPosts.length}</p>
         <p>Performance spikes: {performanceSpikes.length}</p>
+        
+        {metrics.length > 0 && (
+          <div className="mt-2">
+            <p className="font-medium">Total Metrics:</p>
+            <p>• Total Impressions: {metrics.reduce((sum, m) => sum + m.impressions, 0).toLocaleString()}</p>
+            <p>• Total Reach: {metrics.reduce((sum, m) => sum + m.reach, 0).toLocaleString()}</p>
+            <p>• Total Engagement: {metrics.reduce((sum, m) => sum + m.engagement, 0).toLocaleString()}</p>
+          </div>
+        )}
+        
         {debugInfo.posts && debugInfo.posts.length > 0 && (
           <details className="mt-2">
             <summary className="cursor-pointer">Sample Posts</summary>
-            <pre className="text-xs mt-1 bg-yellow-100 p-2 rounded">
+            <pre className="text-xs mt-1 bg-yellow-100 p-2 rounded max-h-32 overflow-auto">
               {JSON.stringify(debugInfo.posts, null, 2)}
             </pre>
           </details>

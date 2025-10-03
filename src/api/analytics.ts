@@ -55,10 +55,10 @@ export type TrendingPost = {
 export async function fetchFacebookMetrics(postId: string, accessToken: string): Promise<AnalyticsMetrics> {
   try {
     console.log('🔍 Fetching Facebook metrics for post:', postId);
+    console.log('🔑 Using access token (first 20 chars):', accessToken.substring(0, 20) + '...');
     
-    // Enhanced fields to get more comprehensive metrics
-    const fields = [
-      'insights.metric(post_impressions,post_impressions_unique,post_engaged_users,post_reactions_by_type_total,post_clicks,post_video_views)',
+    // First, try to get basic post data
+    const basicFields = [
       'shares',
       'comments.summary(true)',
       'likes.summary(true)',
@@ -66,39 +66,54 @@ export async function fetchFacebookMetrics(postId: string, accessToken: string):
       'message',
       'full_picture',
       'story',
-      'type'
+      'type',
+      'permalink_url'
     ].join(',');
     
-    const response = await fetch(`https://graph.facebook.com/v21.0/${postId}?fields=${encodeURIComponent(fields)}&access_token=${accessToken}`);
-    const data = await response.json();
+    const basicResponse = await fetch(`https://graph.facebook.com/v21.0/${postId}?fields=${encodeURIComponent(basicFields)}&access_token=${accessToken}`);
+    const basicData = await basicResponse.json();
     
-    console.log('📊 Facebook analytics response:', data);
+    console.log('📊 Facebook basic data response:', basicData);
     
-    if (!response.ok) {
-      console.warn('Facebook API error:', data.error?.message);
-      throw new Error(data.error?.message || 'Failed to fetch Facebook insights');
+    if (!basicResponse.ok) {
+      console.warn('Facebook basic API error:', basicData.error?.message);
+      throw new Error(basicData.error?.message || 'Failed to fetch Facebook post data');
     }
 
-    const insights = Array.isArray(data.insights?.data) ? data.insights.data : [];
-    const getMetric = (name: string) => insights.find((m: any) => m.name === name)?.values?.[0]?.value ?? 0;
+    // Then try to get insights data (this may fail for some posts)
+    let insightsData = null;
+    try {
+      const insightsResponse = await fetch(`https://graph.facebook.com/v21.0/${postId}/insights?metric=post_impressions,post_impressions_unique,post_engaged_users,post_reactions_by_type_total,post_clicks,post_video_views&access_token=${accessToken}`);
+      insightsData = await insightsResponse.json();
+      console.log('📊 Facebook insights response:', insightsData);
+    } catch (insightsError) {
+      console.warn('⚠️ Facebook insights not available for this post:', insightsError);
+    }
 
-    // Extract comprehensive metrics
-    const impressions = Number(getMetric('post_impressions')) || 0;
-    const reach = Number(getMetric('post_impressions_unique')) || 0;
-    const engaged = Number(getMetric('post_engaged_users')) || 0;
-    const clicks = Number(getMetric('post_clicks')) || 0;
-    const videoViews = Number(getMetric('post_video_views')) || 0;
-    
+    // Extract metrics from insights if available
+    let impressions = 0, reach = 0, engaged = 0, clicks = 0, videoViews = 0;
+    if (insightsData && insightsData.data) {
+      const getMetric = (name: string) => insightsData.data.find((m: any) => m.name === name)?.values?.[0]?.value ?? 0;
+      
+      impressions = Number(getMetric('post_impressions')) || 0;
+      reach = Number(getMetric('post_impressions_unique')) || 0;
+      engaged = Number(getMetric('post_engaged_users')) || 0;
+      clicks = Number(getMetric('post_clicks')) || 0;
+      videoViews = Number(getMetric('post_video_views')) || 0;
+    }
+
     // Get reaction breakdown
-    const reactionsData = getMetric('post_reactions_by_type_total');
     let totalLikes = 0;
-    if (reactionsData && typeof reactionsData === 'object') {
-      totalLikes = Object.values(reactionsData).reduce((sum: number, count: any) => sum + Number(count), 0);
+    if (insightsData && insightsData.data) {
+      const reactionsData = insightsData.data.find((m: any) => m.name === 'post_reactions_by_type_total')?.values?.[0]?.value;
+      if (reactionsData && typeof reactionsData === 'object') {
+        totalLikes = Object.values(reactionsData).reduce((sum: number, count: any) => sum + Number(count), 0);
+      }
     }
     
-    const likes = Number(data.likes?.summary?.total_count) || totalLikes;
-    const comments = Number(data.comments?.summary?.total_count) || 0;
-    const shares = Number(data.shares?.count) || 0;
+    const likes = Number(basicData.likes?.summary?.total_count) || totalLikes;
+    const comments = Number(basicData.comments?.summary?.total_count) || 0;
+    const shares = Number(basicData.shares?.count) || 0;
     
     // Calculate engagement (likes + comments + shares + clicks)
     const engagement = likes + comments + shares + clicks;
@@ -112,7 +127,8 @@ export async function fetchFacebookMetrics(postId: string, accessToken: string):
       comments,
       shares,
       clicks,
-      ctr
+      ctr,
+      hasInsights: !!insightsData
     });
 
     return {
@@ -126,9 +142,9 @@ export async function fetchFacebookMetrics(postId: string, accessToken: string):
       shares,
       clicks,
       ctr,
-      createdAt: data.created_time,
-      content: data.message || data.story || '',
-      imageUrl: data.full_picture || '',
+      createdAt: basicData.created_time,
+      content: basicData.message || basicData.story || '',
+      imageUrl: basicData.full_picture || '',
     };
   } catch (error: unknown) {
     const e = error as Error;
@@ -152,6 +168,7 @@ export async function fetchFacebookMetrics(postId: string, accessToken: string):
 export async function fetchInstagramMetrics(mediaId: string, accessToken: string): Promise<AnalyticsMetrics> {
   try {
     console.log('🔍 Fetching Instagram metrics for media:', mediaId);
+    console.log('🔑 Using access token (first 20 chars):', accessToken.substring(0, 20) + '...');
     
     // First get the media details with enhanced fields
     const mediaFields = [
@@ -170,33 +187,43 @@ export async function fetchInstagramMetrics(mediaId: string, accessToken: string
     
     console.log('📸 Instagram media data:', mediaData);
     
-    // Then get comprehensive insights
-    const insightsMetrics = [
-      'impressions',
-      'reach',
-      'engagement',
-      'likes',
-      'comments',
-      'saved',
-      'shares',
-      'video_views',
-      'profile_visits',
-      'website_clicks'
-    ].join(',');
-    
-    const insightsResponse = await fetch(`https://graph.facebook.com/v21.0/${mediaId}/insights?metric=${insightsMetrics}&access_token=${accessToken}`);
-    const insightsData = await insightsResponse.json();
-    
-    console.log('📊 Instagram insights data:', insightsData);
-    
-    if (!insightsResponse.ok) {
-      console.warn('Instagram API error:', insightsData.error?.message);
-      throw new Error(insightsData.error?.message || 'Failed to fetch Instagram insights');
+    if (!mediaResponse.ok) {
+      console.warn('Instagram media API error:', mediaData.error?.message);
+      throw new Error(mediaData.error?.message || 'Failed to fetch Instagram media data');
     }
 
-    const getMetric = (name: string) => insightsData.data?.find((m: any) => m.name === name)?.values?.[0]?.value ?? 0;
+    // Then try to get comprehensive insights (this may fail for some media)
+    let insightsData = null;
+    try {
+      const insightsMetrics = [
+        'impressions',
+        'reach',
+        'engagement',
+        'likes',
+        'comments',
+        'saved',
+        'shares',
+        'video_views',
+        'profile_visits',
+        'website_clicks'
+      ].join(',');
+      
+      const insightsResponse = await fetch(`https://graph.facebook.com/v21.0/${mediaId}/insights?metric=${insightsMetrics}&access_token=${accessToken}`);
+      insightsData = await insightsResponse.json();
+      
+      console.log('📊 Instagram insights data:', insightsData);
+      
+      if (!insightsResponse.ok) {
+        console.warn('Instagram insights API error:', insightsData.error?.message);
+        // Don't throw here, just log and continue with basic data
+      }
+    } catch (insightsError) {
+      console.warn('⚠️ Instagram insights not available for this media:', insightsError);
+    }
+
+    const getMetric = (name: string) => insightsData?.data?.find((m: any) => m.name === name)?.values?.[0]?.value ?? 0;
     
-    // Extract comprehensive metrics
+    // Extract comprehensive metrics (use insights if available, fallback to basic data)
     const impressions = Number(getMetric('impressions')) || 0;
     const reach = Number(getMetric('reach')) || 0;
     const likes = Number(getMetric('likes')) || Number(mediaData.like_count) || 0;
@@ -220,7 +247,8 @@ export async function fetchInstagramMetrics(mediaId: string, accessToken: string
       comments,
       shares,
       clicks,
-      ctr
+      ctr,
+      hasInsights: !!insightsData
     });
 
     return {
@@ -272,12 +300,28 @@ export async function getPublishedPosts(userId: string) {
 // Get credentials map
 export async function getCredentialsMap(userId: string): Promise<Record<string, UserCredentials>> {
   try {
+    console.log('🔑 Fetching credentials for user:', userId);
     const credsRef = collection(db, 'users', userId, 'credentials');
     const snap = await getDocs(credsRef);
     const map: Record<string, UserCredentials> = {} as any;
+    
     snap.forEach(docSnap => {
-      map[docSnap.id] = { type: docSnap.id, ...(docSnap.data() as any) } as UserCredentials;
+      const data = docSnap.data() as any;
+      const platform = data.type || docSnap.id;
+      map[platform] = { 
+        type: platform, 
+        ...data,
+        id: docSnap.id 
+      } as UserCredentials;
+      
+      console.log(`🔑 Found ${platform} credentials:`, {
+        hasToken: !!data.accessToken,
+        tokenLength: data.accessToken?.length || 0,
+        pageId: data.pageId || data.linkedInUserId || data.instagramUserId || 'N/A'
+      });
     });
+    
+    console.log('🔑 Total credentials found:', Object.keys(map).length);
     return map;
   } catch (error) {
     console.error('Error fetching credentials:', error);
@@ -395,15 +439,22 @@ export async function fetchAllPlatformMetrics(
 ): Promise<AnalyticsMetrics[]> {
   const results: AnalyticsMetrics[] = [];
   
+  console.log('🔍 Fetching metrics for', posts.length, 'posts');
+  console.log('🔑 Available credentials:', Object.keys(credentials));
+  
   for (const post of posts) {
     try {
+      console.log(`📊 Processing ${post.platform} post:`, post.postId || post.id);
       let metrics: AnalyticsMetrics | null = null;
       
       switch (post.platform) {
         case 'facebook': {
           const token = credentials.facebook?.accessToken;
           if (token && post.postId) {
+            console.log('📘 Fetching Facebook metrics...');
             metrics = await fetchFacebookMetrics(post.postId, token);
+          } else {
+            console.warn('⚠️ No Facebook token or postId for post:', post.id);
           }
           break;
         }
@@ -412,7 +463,10 @@ export async function fetchAllPlatformMetrics(
           const token = credentials.instagram?.accessToken;
           const mediaId = post.postId || post.mediaId;
           if (token && mediaId) {
+            console.log('📸 Fetching Instagram metrics...');
             metrics = await fetchInstagramMetrics(mediaId, token);
+          } else {
+            console.warn('⚠️ No Instagram token or mediaId for post:', post.id);
           }
           break;
         }
@@ -420,20 +474,34 @@ export async function fetchAllPlatformMetrics(
         case 'linkedin': {
           const token = credentials.linkedin?.accessToken;
           if (token && post.postId) {
+            console.log('🔗 Fetching LinkedIn metrics...');
             metrics = await fetchLinkedInMetrics(post.postId, token);
+          } else {
+            console.warn('⚠️ No LinkedIn token or postId for post:', post.id);
           }
           break;
         }
+        
+        default:
+          console.warn(`⚠️ Unsupported platform: ${post.platform}`);
       }
       
       if (metrics) {
+        console.log(`✅ Got metrics for ${post.platform}:`, {
+          impressions: metrics.impressions,
+          engagement: metrics.engagement,
+          likes: metrics.likes
+        });
         results.push(metrics);
+      } else {
+        console.warn(`❌ No metrics retrieved for ${post.platform} post:`, post.id);
       }
     } catch (error) {
-      console.error(`Error fetching metrics for ${post.platform} post ${post.postId}:`, error);
+      console.error(`❌ Error fetching metrics for ${post.platform} post ${post.postId}:`, error);
     }
   }
   
+  console.log(`📈 Total metrics collected: ${results.length}/${posts.length}`);
   return results;
 }
 

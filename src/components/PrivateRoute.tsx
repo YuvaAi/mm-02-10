@@ -7,14 +7,14 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const { currentUser, loading } = useAuth();
+  const { currentUser } = useAuth();
 
-  // ✅ Handle loading state first
-  if (loading) {
-    return <div>Loading...</div>;
+  // Show loading only for protected routes when user is not authenticated
+  if (!currentUser) {
+    return <Navigate to="/login" />;
   }
 
-  return currentUser ? <>{children}</> : <Navigate to="/login" />;
+  return <>{children}</>;
 };
 
 export default PrivateRoute;

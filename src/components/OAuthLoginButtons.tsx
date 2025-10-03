@@ -1,7 +1,5 @@
 import React from 'react';
-import FacebookOAuthButton from './FacebookOAuthButton';
-import LinkedInOAuthButton from './LinkedInOAuthButton';
-import { isOAuthConfigured, isLinkedInOAuthConfigured } from '../api/oauth';
+import { FacebookOAuth, LinkedInOAuth, isOAuthConfigured } from '../api/oauth';
 
 interface OAuthLoginButtonsProps {
   onConnect?: (platform: string) => void;
@@ -18,6 +16,16 @@ const OAuthLoginButtons: React.FC<OAuthLoginButtonsProps> = ({
     }
   };
 
+  const handleFacebookConnect = () => {
+    FacebookOAuth.initiateAuth();
+    handleConnect('facebook');
+  };
+
+  const handleLinkedInConnect = () => {
+    LinkedInOAuth.initiateAuth();
+    handleConnect('linkedin');
+  };
+
   return (
     <div className={`space-y-3 ${className}`}>
       <div className="text-center mb-4">
@@ -30,45 +38,25 @@ const OAuthLoginButtons: React.FC<OAuthLoginButtonsProps> = ({
       </div>
 
       {/* Facebook OAuth Button */}
-      <FacebookOAuthButton
-        onSuccess={(tokens) => {
-          console.log('Facebook OAuth successful:', tokens);
-          handleConnect('facebook');
-        }}
-        onError={(error) => {
-          console.error('Facebook OAuth error:', error);
-        }}
-        className="w-full"
-        variant="primary"
-        size="md"
-      />
+      <button
+        onClick={handleFacebookConnect}
+        className="w-full flex items-center justify-center space-x-3 bg-[#1877F2] hover:bg-[#166FE5] text-white px-4 py-3 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+      >
+        <span>Connect Facebook</span>
+      </button>
 
       {/* LinkedIn OAuth Button */}
-      <LinkedInOAuthButton
-        onSuccess={(tokens) => {
-          console.log('LinkedIn OAuth successful:', tokens);
-          handleConnect('linkedin');
-        }}
-        onError={(error) => {
-          console.error('LinkedIn OAuth error:', error);
-        }}
-        className="w-full"
-        variant="primary"
-        size="md"
-      />
+      <button
+        onClick={handleLinkedInConnect}
+        className="w-full flex items-center justify-center space-x-3 bg-[#0077B5] hover:bg-[#005885] text-white px-4 py-3 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+      >
+        <span>Connect LinkedIn</span>
+      </button>
 
-      {!isOAuthConfigured() && !isLinkedInOAuthConfigured() && (
+      {!isOAuthConfigured() && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
           <p className="text-sm text-yellow-800">
             ⚠️ OAuth is not fully configured. Some features may not work properly.
-          </p>
-        </div>
-      )}
-
-      {!isLinkedInOAuthConfigured() && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-          <p className="text-sm text-blue-800">
-            ℹ️ LinkedIn OAuth requires VITE_LINKEDIN_CLIENT_ID environment variable.
           </p>
         </div>
       )}

@@ -1,227 +1,141 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FacebookOAuthService, LinkedInOAuthService } from '../api/oauth';
 import { useAuth } from '../Contexts/AuthContext';
-import { Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { OAuthCallbackHandler } from '../api/oauth';
+import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 const OAuthCallback: React.FC = () => {
   const { platform } = useParams<{ platform: string }>();
-  const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [message, setMessage] = useState('Processing authentication...');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const handleOAuthCallback = async () => {
+    const handleCallback = async () => {
+      if (!currentUser) {
+        setStatus('error');
+        setMessage('User not authenticated. Please log in first.');
+        return;
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const state = urlParams.get('state');
+      const error = urlParams.get('error');
+      const errorDescription = urlParams.get('error_description');
+
+      if (error) {
+        setStatus('error');
+        setMessage(`OAuth error: ${errorDescription || error}`);
+        return;
+      }
+
+      if (!code) {
+        setStatus('error');
+        setMessage('No authorization code received from OAuth provider');
+        return;
+      }
+
+      // Basic state validation
+      if (!state) {
+        setStatus('error');
+        setMessage('Missing state parameter. This may be a security issue.');
+        return;
+      }
+
       try {
-        if (platform === 'facebook') {
-          // For Facebook implicit flow, check URL fragment for access token
-          const hash = window.location.hash.substring(1);
-          const urlParams = new URLSearchParams(hash);
-          const accessToken = urlParams.get('access_token');
-          const state = urlParams.get('state');
-          const error = urlParams.get('error');
-
-          if (error) {
+        let result;
+        
+        switch (platform) {
+          case 'facebook':
+            result = await OAuthCallbackHandler.handleFacebookCallback(currentUser.uid, code);
+            break;
+          case 'linkedin':
+            result = await OAuthCallbackHandler.handleLinkedInCallback(currentUser.uid, code);
+            break;
+          default:
             setStatus('error');
-            setMessage(`Authentication failed: ${error}`);
+            setMessage(`Unknown platform: ${platform}`);
             return;
-          }
+        }
 
-          if (!accessToken || !state) {
-            setStatus('error');
-            setMessage('Missing authentication parameters');
-            return;
-          }
-          const result = await FacebookOAuthService.handleCallback(accessToken, state);
+        if (result.success) {
+          setStatus('success');
+          setMessage(`${platform?.charAt(0).toUpperCase()}${platform?.slice(1)} connected successfully!`);
           
-          if (result.success && result.accessToken) {
-            // Store tokens securely
-            FacebookOAuthService.storeTokens({
-              accessToken: result.accessToken,
-              expiresIn: result.expiresIn || 3600,
-              tokenType: 'Bearer',
-              scope: 'public_profile,email,pages_manage_posts,ads_management,ads_read'
-            }, result.userInfo);
-
-            // Store access token in session storage for auto-connect
-            sessionStorage.setItem('facebook_access_token', result.accessToken);
-
-            // Auto-connect accounts - try both with current user and with a delay
-            const attemptAutoConnect = async (user: any) => {
-              try {
-                // Import and call the auto-connect function
-                const { signInWithFacebookAndConnect } = await import('../utils/autoConnectSocialAccounts');
-                const connectResult = await signInWithFacebookAndConnect(user, result.accessToken);
-                
-                if (connectResult.success) {
-                  console.log('Facebook accounts auto-connected successfully');
-                } else {
-                  console.warn('Facebook auto-connect failed:', connectResult.error);
-                }
-              } catch (connectError) {
-                console.warn('Error during Facebook auto-connect:', connectError);
-              }
-            };
-
-            // Try immediately if user is available
-            if (currentUser) {
-              await attemptAutoConnect(currentUser);
-            } else {
-              // If user is not available yet, wait a bit and try again
-              console.log('User not authenticated yet, waiting for authentication...');
-              setTimeout(async () => {
-                // Check if user is now available
-                const { currentUser: delayedUser } = useAuth();
-                if (delayedUser) {
-                  await attemptAutoConnect(delayedUser);
-                } else {
-                  console.warn('User still not authenticated after delay, auto-connect will be handled by SocialLoginButtons');
-                }
-              }, 2000);
-            }
-
-            setStatus('success');
-            setMessage('Successfully connected to Facebook! All credentials have been saved.');
-            
-            // Redirect to dashboard after a short delay
-            setTimeout(() => {
-              navigate('/dashboard');
-            }, 2000);
-          } else {
-            setStatus('error');
-            setMessage(result.error || 'Authentication failed');
-          }
-        } else if (platform === 'linkedin') {
-          // For LinkedIn authorization code flow, check URL search params
-          const urlParams = new URLSearchParams(window.location.search);
-          const code = urlParams.get('code');
-          const state = urlParams.get('state');
-          const error = urlParams.get('error');
-          const errorDescription = urlParams.get('error_description');
-
-          if (error) {
-            setStatus('error');
-            setMessage(`LinkedIn authentication failed: ${errorDescription || error}`);
-            return;
-          }
-
-          if (!code || !state) {
-            setStatus('error');
-            setMessage('Missing LinkedIn authentication parameters. Please try again.');
-            return;
-          }
-
-          if (!currentUser) {
-            setStatus('error');
-            setMessage('User not authenticated. Please login first.');
-            return;
-          }
-
-          const result = await LinkedInOAuthService.handleCallback(code, state, currentUser.uid);
-          
-          if (result.success && result.accessToken) {
-            // Store tokens securely for dynamic user
-            LinkedInOAuthService.storeTokens({
-              accessToken: result.accessToken,
-              expiresIn: result.expiresIn || 3600,
-              tokenType: 'Bearer',
-              scope: 'w_member_social,w_organization_social,r_basicprofile' // Only required permissions
-            }, result.userInfo);
-
-            // Store access token in session storage for auto-connect
-            sessionStorage.setItem('linkedin_access_token', result.accessToken);
-
-            // Auto-connect LinkedIn account
-            const attemptAutoConnect = async (user: any) => {
-              try {
-                // Import and call the auto-connect function
-                const { signInWithLinkedInAndConnect } = await import('../utils/autoConnectSocialAccounts');
-                const connectResult = await signInWithLinkedInAndConnect(user, result.accessToken);
-                
-                if (connectResult.success) {
-                  console.log('LinkedIn accounts auto-connected successfully');
-                } else {
-                  console.warn('LinkedIn auto-connect failed:', connectResult.error);
-                }
-              } catch (connectError) {
-                console.warn('Error during LinkedIn auto-connect:', connectError);
-              }
-            };
-
-            // Only attempt auto-connect if we have a valid access token
-            if (result.accessToken) {
-              await attemptAutoConnect(currentUser);
-            } else {
-              console.warn('No access token available for LinkedIn auto-connect');
-            }
-
-            setStatus('success');
-            setMessage('Successfully connected to LinkedIn! All credentials have been saved.');
-            
-            // Redirect to dashboard after a short delay
-            setTimeout(() => {
-              navigate('/dashboard');
-            }, 2000);
-          } else {
-            setStatus('error');
-            setMessage(result.error || 'Authentication failed');
-          }
+          // Redirect to credential vault after 2 seconds
+          setTimeout(() => {
+            navigate('/credential-vault');
+          }, 2000);
         } else {
           setStatus('error');
-          setMessage('Unsupported platform');
+          setMessage(result.error || 'Failed to connect account');
         }
-      } catch (error) {
-        console.error('OAuth callback error:', error);
+      } catch (error: unknown) {
+        const err = error as Error;
+        console.error('OAuth callback error:', err);
         setStatus('error');
-        setMessage('An unexpected error occurred');
+        setMessage(err.message || 'An unexpected error occurred');
       }
     };
 
-    handleOAuthCallback();
-  }, [platform, navigate, currentUser]);
+    handleCallback();
+  }, [currentUser, platform, navigate]);
+
+  const getStatusIcon = () => {
+    switch (status) {
+      case 'loading':
+        return <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />;
+      case 'success':
+        return <CheckCircle className="w-12 h-12 text-green-600" />;
+      case 'error':
+        return <AlertCircle className="w-12 h-12 text-red-600" />;
+    }
+  };
+
+  const getStatusColor = () => {
+    switch (status) {
+      case 'loading':
+        return 'text-blue-600';
+      case 'success':
+        return 'text-green-600';
+      case 'error':
+        return 'text-red-600';
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 text-center">
-          <div className="mb-6">
-            {status === 'loading' && (
-              <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto" />
-            )}
-            {status === 'success' && (
-              <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
-            )}
-            {status === 'error' && (
-              <XCircle className="w-16 h-16 text-red-500 mx-auto" />
-            )}
-          </div>
-          
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            {status === 'loading' && 'Connecting...'}
-            {status === 'success' && 'Success!'}
-            {status === 'error' && 'Error'}
-          </h2>
-          
-          <p className="text-gray-600 mb-6">
-            {message}
-          </p>
-          
-          {status === 'success' && (
-            <p className="text-sm text-gray-500">
-              Redirecting to dashboard...
-            </p>
-          )}
-          
-          {status === 'error' && (
-            <button
-              onClick={() => navigate('/login')}
-              className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-colors"
-            >
-              Try Again
-            </button>
-          )}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
+      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+        <div className="flex justify-center mb-6">
+          {getStatusIcon()}
         </div>
+        
+        <h1 className={`text-2xl font-bold mb-4 ${getStatusColor()}`}>
+          {status === 'loading' && 'Connecting...'}
+          {status === 'success' && 'Success!'}
+          {status === 'error' && 'Connection Failed'}
+        </h1>
+        
+        <p className="text-gray-600 mb-6">
+          {message}
+        </p>
+        
+        {status === 'success' && (
+          <p className="text-sm text-gray-500">
+            Redirecting to Credential Vault...
+          </p>
+        )}
+        
+        {status === 'error' && (
+          <button
+            onClick={() => navigate('/credential-vault')}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Back to Credential Vault
+          </button>
+        )}
       </div>
     </div>
   );

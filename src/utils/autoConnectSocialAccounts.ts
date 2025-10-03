@@ -363,3 +363,44 @@ export async function checkLinkedInConnection(user: User): Promise<{ success: bo
     return { success: false, error: err.message };
   }
 }
+
+// Check if Facebook is already connected and handle reconnection
+export async function checkFacebookConnection(user: User): Promise<{ success: boolean; error?: string; isConnected?: boolean }> {
+  try {
+    console.log('Checking Facebook connection for user:', user.uid);
+    
+    // Import getCredential function
+    const { getCredential } = await import('../firebase/firestore');
+    
+    // Check if Facebook credentials already exist
+    const credentialResult = await getCredential(user.uid, 'facebook');
+    
+    if (credentialResult.success && credentialResult.data) {
+      console.log('Facebook credentials found:', credentialResult.data);
+      
+      // Check if the access token is still valid by making a test API call
+      try {
+        const testResponse = await fetch(`https://graph.facebook.com/v21.0/me?access_token=${credentialResult.data.accessToken}`);
+        const testData = await testResponse.json();
+        
+        if (testResponse.ok && testData.id) {
+          console.log('Facebook connection is still valid');
+          return { success: true, isConnected: true };
+        } else {
+          console.log('Facebook connection expired, needs reconnection');
+          return { success: true, isConnected: false };
+        }
+      } catch (testError) {
+        console.log('Facebook connection test failed, needs reconnection');
+        return { success: true, isConnected: false };
+      }
+    } else {
+      console.log('No Facebook credentials found');
+      return { success: true, isConnected: false };
+    }
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error('Error checking Facebook connection:', err);
+    return { success: false, error: err.message };
+  }
+}

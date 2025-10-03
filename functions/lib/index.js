@@ -33,14 +33,17 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.publishLinkedInPost = exports.exchangeLinkedInCode = exports.createNewCampaignFunction = exports.createFacebookAdCampaignFunction = exports.createFacebookAd = void 0;
+exports.fetchAnalyticsDataFunction = exports.publishLinkedInPost = exports.exchangeFacebookCode = exports.exchangeLinkedInCode = exports.createNewCampaignFunction = exports.createFacebookAdCampaignFunction = exports.createFacebookAd = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const facebookAds_1 = require("./facebookAds");
 const linkedinOAuth_1 = require("./linkedinOAuth");
 Object.defineProperty(exports, "exchangeLinkedInCode", { enumerable: true, get: function () { return linkedinOAuth_1.exchangeLinkedInCode; } });
+const facebookOAuth_1 = require("./facebookOAuth");
+Object.defineProperty(exports, "exchangeFacebookCode", { enumerable: true, get: function () { return facebookOAuth_1.exchangeFacebookCode; } });
 const linkedinPost_1 = require("./linkedinPost");
 Object.defineProperty(exports, "publishLinkedInPost", { enumerable: true, get: function () { return linkedinPost_1.publishLinkedInPost; } });
+const analytics_1 = require("./analytics");
 admin.initializeApp();
 // Wrap your custom functions so they match Firebase's Callable function signature
 exports.createFacebookAd = functions.https.onCall(async (request) => {
@@ -51,5 +54,9 @@ exports.createFacebookAdCampaignFunction = functions.https.onCall(async (request
 });
 exports.createNewCampaignFunction = functions.https.onCall(async (request) => {
     return await (0, facebookAds_1.createNewCampaignFunction)(request.data, { auth: request.auth });
+});
+// Analytics function
+exports.fetchAnalyticsDataFunction = functions.https.onCall(async (request) => {
+    return await (0, analytics_1.fetchAnalyticsData)(request.data, { auth: request.auth });
 });
 //# sourceMappingURL=index.js.map

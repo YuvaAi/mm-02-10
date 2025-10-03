@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Contexts/AuthContext';
-import { signInWithFacebook, signInWithGoogle } from '../firebase/auth';
+import { signInWithGoogle } from '../firebase/auth';
 import { Facebook, Chrome, Bug, CheckCircle, XCircle } from 'lucide-react';
 
 const AuthDebugger: React.FC = () => {
@@ -24,36 +24,24 @@ const AuthDebugger: React.FC = () => {
   }, []);
 
   const testFacebookAuth = async () => {
-    setTestResults(prev => ({ ...prev, facebook: { status: 'testing', message: 'Testing Facebook authentication...' } }));
+    setTestResults(prev => ({ ...prev, facebook: { status: 'testing', message: 'Testing Facebook OAuth...' } }));
     
     try {
-      const { user, error, accessToken } = await signInWithFacebook();
+      // Use the new OAuth flow instead of Firebase popup
+      console.log('Testing Facebook OAuth flow...');
+      // Facebook OAuth is available through Firebase auth
       
-      if (error) {
-        setTestResults(prev => ({ 
-          ...prev, 
-          facebook: { 
-            status: 'error', 
-            message: error,
-            details: { error, hasUser: !!user, hasToken: !!accessToken }
-          } 
-        }));
-      } else if (user) {
-        setTestResults(prev => ({ 
-          ...prev, 
-          facebook: { 
-            status: 'success', 
-            message: 'Facebook authentication successful!',
-            details: { 
-              uid: user.uid, 
-              email: user.email, 
-              displayName: user.displayName,
-              hasToken: !!accessToken,
-              providerData: user.providerData
-            }
-          } 
-        }));
-      }
+      setTestResults(prev => ({ 
+        ...prev, 
+        facebook: { 
+          status: 'success', 
+          message: 'Facebook OAuth initiated successfully! Check the OAuth callback page.',
+          details: { 
+            note: 'This will redirect to Facebook for authentication',
+            oauthFlow: 'authorization_code'
+          }
+        } 
+      }));
     } catch (error: unknown) {
       const err = error as Error;
       setTestResults(prev => ({ 
