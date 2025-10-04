@@ -132,23 +132,23 @@ const SocialMediaDebugger: React.FC = () => {
   };
 
   return (
-    <div className="bg-bg-alt rounded-xl shadow-md shadow-purple border border-border-purple p-6 max-w-4xl mx-auto hover:shadow-purple-strong transition-all duration-250 animate-slide-in-top">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 p-6 max-w-4xl mx-auto transition-all duration-250 animate-slide-in-top">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-bold text-text text-glow">
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 text-glow">
           🚀 NEW SOCIAL MEDIA DEBUGGER v2.0 🚀
         </h3>
         <div className="flex space-x-3">
           <button
             onClick={handleManualSaveCredentials}
             disabled={saving || !currentUser}
-            className="bg-gradient-button text-primary-contrast px-6 py-3 rounded-lg hover:bg-gradient-reverse disabled:opacity-50 text-lg font-bold shadow-purple hover:shadow-purple-strong transition-all duration-250"
+            className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark disabled:opacity-50 text-lg font-bold transition-all duration-250"
           >
             {saving ? 'Saving...' : '💾 Save Facebook Credentials'}
           </button>
           <button
             onClick={loadCredentials}
             disabled={loading}
-            className="bg-gradient-accent text-primary-contrast px-6 py-3 rounded-lg hover:bg-gradient-reverse disabled:opacity-50 text-lg font-bold shadow-violet hover:shadow-violet-strong transition-all duration-250"
+            className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark disabled:opacity-50 text-lg font-bold transition-all duration-250"
           >
             {loading ? 'Loading...' : '🔄 Refresh'}
           </button>
@@ -188,16 +188,16 @@ const SocialMediaDebugger: React.FC = () => {
           ) : allCredentials.length > 0 ? (
             <div className="space-y-4">
               {allCredentials.map((cred, index) => (
-                <div key={index} className="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg border-2 border-blue-200">
+                <div key={index} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600">
                   <div className="flex items-center justify-between mb-3">
-                    <h5 className="text-lg font-bold text-gray-900 capitalize">
+                    <h5 className="text-lg font-bold text-gray-900 dark:text-gray-100 capitalize">
                       {cred.type === 'facebook' && '📘 Facebook'}
                       {cred.type === 'instagram' && '📷 Instagram'}
                       {cred.type === 'google' && '🔍 Google'}
                       {' '}Credentials
                     </h5>
                     {cred.isAutoConnected && (
-                      <span className="bg-green-500 text-white text-sm px-3 py-1 rounded-full font-bold">
+                      <span className="bg-primary text-white text-sm px-3 py-1 rounded-full font-bold">
                         ✅ Auto-connected
                       </span>
                     )}
@@ -236,16 +236,16 @@ const SocialMediaDebugger: React.FC = () => {
           ) : (
             <div className="text-center py-8">
               <div className="text-6xl mb-4">❌</div>
-              <h5 className="text-xl font-bold text-red-600 mb-2">No Credentials Found</h5>
-              <p className="text-gray-600">No social media credentials have been saved yet.</p>
-              <p className="text-gray-600 mt-2">Go to Facebook Content Creator to save your credentials!</p>
+              <h5 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">No Credentials Found</h5>
+              <p className="text-gray-600 dark:text-gray-300">No social media credentials have been saved yet.</p>
+              <p className="text-gray-600 dark:text-gray-300 mt-2">Go to Facebook Content Creator to save your credentials!</p>
             </div>
           )}
         </div>
 
-        <div className="bg-blue-100 border-2 border-blue-300 p-4 rounded-lg">
-          <h5 className="font-bold text-blue-800 mb-2">🔧 Debug Information:</h5>
-          <div className="text-sm text-blue-700 space-y-1">
+        <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 p-4 rounded-lg">
+          <h5 className="font-bold text-gray-900 dark:text-gray-100 mb-2">🔧 Debug Information:</h5>
+          <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
             <div><strong>User ID:</strong> {currentUser?.uid || 'Not logged in'}</div>
             <div><strong>Email:</strong> {currentUser?.email || 'N/A'}</div>
             <div><strong>Display Name:</strong> {currentUser?.displayName || 'N/A'}</div>

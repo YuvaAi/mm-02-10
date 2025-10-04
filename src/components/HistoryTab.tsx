@@ -242,24 +242,24 @@ const HistoryTab: React.FC = () => {
         </div>
         <button
           onClick={loadPosts}
-          className="px-4 py-2 bg-gradient-button text-primary-contrast rounded-lg hover:bg-gradient-reverse transition-all duration-250 shadow-purple hover:shadow-purple-strong"
+          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-all duration-250"
         >
           Refresh
         </button>
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-600">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
             <input
               type="text"
               placeholder="Search posts..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
 
@@ -267,7 +267,7 @@ const HistoryTab: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             aria-label="Filter by status"
           >
             <option value="all">All Status</option>
@@ -279,7 +279,7 @@ const HistoryTab: React.FC = () => {
           <select
             value={platformFilter}
             onChange={(e) => setPlatformFilter(e.target.value as any)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             aria-label="Filter by platform"
           >
             <option value="all">All Platforms</option>
@@ -296,7 +296,7 @@ const HistoryTab: React.FC = () => {
               setSortBy(sort as any);
               setSortOrder(order as any);
             }}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             aria-label="Sort posts"
           >
             <option value="date-desc">Newest First</option>
@@ -309,10 +309,10 @@ const HistoryTab: React.FC = () => {
 
       {/* Posts Grid */}
       {filteredAndSortedPosts.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm p-12 border border-gray-200 text-center">
-          <Eye className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No posts found</h3>
-          <p className="text-gray-600">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-12 border border-gray-200 dark:border-gray-600 text-center">
+          <Eye className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No posts found</h3>
+          <p className="text-gray-600 dark:text-gray-300">
             {posts.length === 0 
               ? "You haven't created any posts yet. Start by generating some content!"
               : "No posts match your current filters. Try adjusting your search criteria."
@@ -322,10 +322,10 @@ const HistoryTab: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredAndSortedPosts.map((post) => (
-            <div key={post.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+            <div key={post.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 overflow-hidden hover:shadow-lg transition-shadow">
               {/* Post Image */}
               {post.imageUrl && (
-                <div className="relative h-48 bg-gray-100">
+                <div className="relative h-48 bg-gray-100 dark:bg-gray-700">
                   <img
                     src={post.imageUrl}
                     alt="Post"
@@ -337,17 +337,17 @@ const HistoryTab: React.FC = () => {
                   <div className="absolute top-2 right-2 flex space-x-1">
                     <button
                       onClick={() => copyToClipboard(post.content)}
-                      className="p-1 bg-white rounded-full shadow-sm hover:bg-gray-50"
+                      className="p-1 bg-white dark:bg-gray-600 rounded-full shadow-sm hover:bg-gray-50 dark:hover:bg-gray-500"
                       title="Copy content"
                     >
-                      <Copy className="w-3 h-3 text-gray-600" />
+                      <Copy className="w-3 h-3 text-gray-600 dark:text-gray-300" />
                     </button>
                     <button
                       onClick={() => downloadImage(post.imageUrl!, `post-${post.id}.jpg`)}
-                      className="p-1 bg-white rounded-full shadow-sm hover:bg-gray-50"
+                      className="p-1 bg-white dark:bg-gray-600 rounded-full shadow-sm hover:bg-gray-50 dark:hover:bg-gray-500"
                       title="Download image"
                     >
-                      <Download className="w-3 h-3 text-gray-600" />
+                      <Download className="w-3 h-3 text-gray-600 dark:text-gray-300" />
                     </button>
                   </div>
                 </div>
@@ -359,7 +359,7 @@ const HistoryTab: React.FC = () => {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
                     {post.platform && getPlatformIcon(post.platform)}
-                    <span className="text-sm font-medium text-gray-600 capitalize">
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300 capitalize">
                       {post.platform || 'General'}
                     </span>
                   </div>
@@ -368,10 +368,10 @@ const HistoryTab: React.FC = () => {
 
                 {/* Content */}
                 <div className="mb-4">
-                  <p className="text-gray-900 text-sm line-clamp-3 mb-2">
+                  <p className="text-gray-900 dark:text-gray-100 text-sm line-clamp-3 mb-2">
                     {post.content}
                   </p>
-                  <div className="flex items-center text-xs text-gray-500">
+                  <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
                     <Calendar className="w-3 h-3 mr-1" />
                     {formatDate(post.createdAt)}
                   </div>
@@ -380,15 +380,15 @@ const HistoryTab: React.FC = () => {
                 {/* Category and Prompt */}
                 <div className="mb-4 space-y-2">
                   <div className="flex items-center">
-                    <span className="text-xs font-medium text-gray-500 mr-2">Category:</span>
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400 mr-2">Category:</span>
+                    <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded-full">
                       {post.category}
                     </span>
                   </div>
                   {post.prompt && (
                     <div>
-                      <span className="text-xs font-medium text-gray-500">Prompt:</span>
-                      <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Prompt:</span>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
                         {post.prompt}
                       </p>
                     </div>
@@ -401,26 +401,26 @@ const HistoryTab: React.FC = () => {
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       {post.impressions && (
                         <div className="text-center">
-                          <p className="font-semibold text-gray-900">{post.impressions.toLocaleString()}</p>
-                          <p className="text-gray-500">Impressions</p>
+                          <p className="font-semibold text-gray-900 dark:text-gray-100">{post.impressions.toLocaleString()}</p>
+                          <p className="text-gray-500 dark:text-gray-400">Impressions</p>
                         </div>
                       )}
                       {post.likes && (
                         <div className="text-center">
-                          <p className="font-semibold text-gray-900">{post.likes.toLocaleString()}</p>
-                          <p className="text-gray-500">Likes</p>
+                          <p className="font-semibold text-gray-900 dark:text-gray-100">{post.likes.toLocaleString()}</p>
+                          <p className="text-gray-500 dark:text-gray-400">Likes</p>
                         </div>
                       )}
                       {post.comments && (
                         <div className="text-center">
-                          <p className="font-semibold text-gray-900">{post.comments.toLocaleString()}</p>
-                          <p className="text-gray-500">Comments</p>
+                          <p className="font-semibold text-gray-900 dark:text-gray-100">{post.comments.toLocaleString()}</p>
+                          <p className="text-gray-500 dark:text-gray-400">Comments</p>
                         </div>
                       )}
                       {post.shares && (
                         <div className="text-center">
-                          <p className="font-semibold text-gray-900">{post.shares.toLocaleString()}</p>
-                          <p className="text-gray-500">Shares</p>
+                          <p className="font-semibold text-gray-900 dark:text-gray-100">{post.shares.toLocaleString()}</p>
+                          <p className="text-gray-500 dark:text-gray-400">Shares</p>
                         </div>
                       )}
                     </div>
@@ -433,21 +433,21 @@ const HistoryTab: React.FC = () => {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => copyToClipboard(post.content)}
-                        className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+                        className="text-xs text-primary hover:text-primary-dark font-medium"
                       >
                         Copy Content
                       </button>
                       {post.imageUrl && (
                         <button
                           onClick={() => downloadImage(post.imageUrl!, `post-${post.id}.jpg`)}
-                          className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+                          className="text-xs text-primary hover:text-primary-dark font-medium"
                         >
                           Download Image
                         </button>
                       )}
                     </div>
                     <button 
-                      className="p-1 text-gray-400 hover:text-gray-600"
+                      className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                       aria-label="More options"
                       title="More options"
                     >

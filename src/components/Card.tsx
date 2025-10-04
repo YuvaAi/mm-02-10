@@ -18,7 +18,7 @@ const Card: React.FC<CardProps> = ({
   const baseClasses = 'rounded-xl border transition-all duration-250 relative overflow-hidden';
   
   const variantClasses = {
-    black: 'bg-bg border-border shadow-md shadow-turquoise hover:shadow-turquoise-strong hover:-translate-y-1',
+    black: 'bg-white dark:bg-gray-800 border-border shadow-md shadow-turquoise hover:shadow-turquoise-strong hover:-translate-y-1',
     purple: 'bg-bg-alt border-border-turquoise shadow-md shadow-black hover:shadow-black hover:-translate-y-1',
     gradient: 'bg-gradient-alt border-border-turquoise shadow-md shadow-turquoise hover:shadow-turquoise-strong hover:-translate-y-1',
     elevated: 'bg-bg-alt border-border-turquoise shadow-xl shadow-turquoise hover:shadow-2xl hover:-translate-y-2'
@@ -49,7 +49,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
 }) => {
   const variantClasses = variant === 'gradient' 
     ? 'bg-gradient-button' 
-    : 'bg-bg border-b border-border';
+    : 'bg-white dark:bg-gray-800 border-b border-border';
     
   return (
     <div className={`px-6 py-4 ${variantClasses} ${className}`}>
@@ -95,7 +95,7 @@ export const CardFooter: React.FC<CardFooterProps> = ({
 }) => {
   const variantClasses = variant === 'gradient' 
     ? 'bg-gradient-alt border-t border-border-purple' 
-    : 'bg-bg border-t border-border';
+    : 'bg-white dark:bg-gray-800 border-t border-border';
     
   return (
     <div className={`px-6 py-4 ${variantClasses} ${className}`}>

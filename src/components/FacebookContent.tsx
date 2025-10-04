@@ -533,7 +533,7 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
           )}
 
           {/* Debug Info */}
-          <div className="bg-bg border border-border rounded-lg p-4 mb-4 shadow-md">
+          <div className="bg-white dark:bg-gray-800 border border-border rounded-lg p-4 mb-4 shadow-md">
             <h3 className="font-medium text-text mb-2">Debug Info:</h3>
             <div className="text-sm text-text-secondary space-y-1">
               <p><strong>Platform:</strong> {platform}</p>
@@ -813,7 +813,7 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
                   <h3 className="text-md font-medium text-text mb-2">Uploaded Media</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {uploadedMedia.map((file, index) => (
-                      <div key={index} className="relative bg-bg rounded-lg p-2 border border-border">
+                      <div key={index} className="relative bg-white dark:bg-gray-800 rounded-lg p-2 border border-border">
                         <div className="aspect-square bg-bg-alt rounded flex items-center justify-center">
                           <span className="text-xs text-text-secondary text-center">
                             {file.type.startsWith('image/') ? '📷' : '🎥'} {file.name}
@@ -841,7 +841,7 @@ export default function FacebookContent({ platform }: FacebookContentProps) {
                {generatedContent && (
                  <div>
                    <h3 className="text-md font-medium text-text mb-2">Content</h3>
-                   <div className="bg-bg rounded-lg p-4 border border-border">
+                   <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-border">
                      <p className="text-text whitespace-pre-wrap">
                        {generatedContent}
                      </p>

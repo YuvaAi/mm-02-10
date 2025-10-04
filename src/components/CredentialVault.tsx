@@ -4,13 +4,10 @@ import { useAuth } from '../Contexts/AuthContext';
 import { validateFacebookCredentials, getFacebookPages, getFacebookAccessToken } from '../api/facebook';
 import { saveCredential, getCredentials } from '../firebase/firestore';
 import { handleSocialSignup } from '../utils/autoConnectSocialAccounts';
-import { Key, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft, Zap, RefreshCw, Link as LinkIcon } from 'lucide-react';
+import { Key, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 import { UserCredentials } from '../firebase/types';
 import CredentialDebugger from './CredentialDebugger';
 import GlassPanel from './GlassPanel';
-import { OAuthTokenService, isOAuthAvailable } from '../services/oauthTokenService';
-import { isOAuthConfigured } from '../api/oauth';
-import OAuthLoginButtons from './OAuthLoginButtons';
 
 interface FacebookPage {
   id: string;
@@ -59,7 +56,9 @@ const CredentialVault: React.FC = () => {
   const [adsCampaignId, setAdsCampaignId] = useState('');
   const [isSavingAds, setIsSavingAds] = useState(false);
   const [adsMessage, setAdsMessage] = useState('');
-  const [isAutoConnecting, setIsAutoConnecting] = useState(false);
+
+  // OAuth Extracted Credentials expand/collapse state
+  const [isOAuthCredentialsExpanded, setIsOAuthCredentialsExpanded] = useState(true);
 
   const loadSavedCredentials = useCallback(async () => {
     if (!currentUser) return;
@@ -155,28 +154,6 @@ const CredentialVault: React.FC = () => {
     }
   };
 
-  const handleManualAutoConnect = async () => {
-    if (!currentUser) return;
-    
-    setIsAutoConnecting(true);
-    try {
-      console.log('Manually triggering auto-connect...');
-      await handleSocialSignup(currentUser);
-      
-      // Reload credentials after auto-connect
-      await loadSavedCredentials();
-      
-      setValidationMessage('Social accounts auto-connected successfully!');
-      setValidationStatus('valid');
-    } catch (error: unknown) {
-      const err = error as Error;
-      console.error('Manual auto-connect failed:', err);
-      setValidationMessage(`Auto-connect failed: ${err.message}`);
-      setValidationStatus('invalid');
-    } finally {
-      setIsAutoConnecting(false);
-    }
-  };
 
   const saveCredentials = async () => {
     if (!currentUser) return;
@@ -368,11 +345,11 @@ const CredentialVault: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-main animate-gradient p-6">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-bg-alt rounded-2xl shadow-md shadow-purple border border-border-purple p-8 hover:shadow-purple-strong transition-all duration-250 animate-slide-in-top">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-600 p-8 transition-all duration-250 animate-slide-in-top">
           <div className="flex items-center mb-6">
             <button
               onClick={() => navigate('/dashboard')}
-              className="flex items-center space-x-2 text-text-secondary hover:text-text transition-all duration-250 mr-6 hover:bg-bg-secondary px-3 py-2 rounded-lg"
+              className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-all duration-250 mr-6 hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-lg"
             >
               <ArrowLeft className="w-5 h-5" />
               <span>Back to Dashboard</span>
@@ -381,11 +358,11 @@ const CredentialVault: React.FC = () => {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center">
               <Key className="w-8 h-8 text-primary mr-3 icon-glow" />
-              <h1 className="text-3xl font-bold text-text text-glow">Credential Vault</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 text-glow">Credential Vault</h1>
             </div>
             <button
               onClick={loadSavedCredentials}
-              className="flex items-center space-x-2 bg-gradient-button text-primary-contrast px-4 py-2 rounded-lg hover:bg-gradient-reverse transition-all duration-250 shadow-purple hover:shadow-purple-strong"
+              className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-all duration-250"
             >
               <RefreshCw className="w-4 h-4" />
               <span>Refresh</span>
@@ -397,70 +374,37 @@ const CredentialVault: React.FC = () => {
             <CredentialDebugger />
           </div>
 
-          {/* OAuth Status Section */}
-          {isOAuthConfigured() && (
-            <GlassPanel variant="accent" className="animate-slide-in-left">
-              <div className="glass-panel-content">
-                <div className="glass-panel-header">
-                  <div className="flex items-center mb-4">
-                    <LinkIcon className="w-6 h-6 text-primary mr-2 icon-glow" />
-                    <h2 className="glass-panel-title text-xl font-semibold">OAuth Connection Status</h2>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  {/* Facebook OAuth Status */}
-                  <div className="flex items-center justify-between p-4 bg-bg rounded-lg border border-border">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-[#1877F2] rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">f</span>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-text">Facebook</h3>
-                        <p className="text-sm text-text-secondary">
-                          {isOAuthAvailable() ? 'Connected via OAuth' : 'Not connected'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {isOAuthAvailable() ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      ) : (
-                        <AlertCircle className="w-5 h-5 text-yellow-500" />
-                      )}
-                    </div>
-                  </div>
-
-                  {/* OAuth Info */}
-                  <div className="bg-bg border border-info rounded-lg p-3 shadow-info">
-                    <p className="text-xs text-info">
-                      <strong>OAuth Status:</strong> {isOAuthAvailable() 
-                        ? 'You are connected via Facebook OAuth. Tokens are automatically managed.' 
-                        : 'No OAuth connection found. Use the Facebook login button on the login page to connect automatically.'
-                      }
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </GlassPanel>
-          )}
 
           {/* OAuth Extracted Data Display */}
           {(facebookOAuthData || facebookAdsData || instagramOAuthData) && (
             <GlassPanel variant="accent" className="animate-slide-in-left">
               <div className="glass-panel-content">
                 <div className="glass-panel-header">
-                  <div className="flex items-center mb-4">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-2 icon-glow" />
-                    <h2 className="glass-panel-title text-xl font-semibold">OAuth Extracted Credentials</h2>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <CheckCircle className="w-6 h-6 text-green-500 mr-2 icon-glow" />
+                      <h2 className="glass-panel-title text-xl font-semibold">OAuth Extracted Credentials</h2>
+                    </div>
+                    <button
+                      onClick={() => setIsOAuthCredentialsExpanded(!isOAuthCredentialsExpanded)}
+                      className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                      aria-label={isOAuthCredentialsExpanded ? 'Collapse OAuth credentials' : 'Expand OAuth credentials'}
+                    >
+                      {isOAuthCredentialsExpanded ? (
+                        <ChevronUp className="w-5 h-5" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5" />
+                      )}
+                    </button>
                   </div>
                 </div>
                 
-                <div className="space-y-4">
-                  {/* Facebook OAuth Data */}
-                  {facebookOAuthData && (
-                    <div className="bg-bg border border-success rounded-lg p-4">
-                      <h3 className="font-semibold text-text mb-3 flex items-center">
+                {isOAuthCredentialsExpanded && (
+                  <div className="space-y-4">
+                    {/* Facebook OAuth Data */}
+                    {facebookOAuthData && (
+                    <div className="bg-white dark:bg-gray-800 border border-success rounded-lg p-4">
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
                         <div className="w-8 h-8 bg-[#1877F2] rounded-full flex items-center justify-center mr-3">
                           <span className="text-white font-bold text-sm">f</span>
                         </div>
@@ -468,36 +412,36 @@ const CredentialVault: React.FC = () => {
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-text-secondary">Page ID:</span>
-                          <span className="ml-2 font-mono text-text">{facebookOAuthData.pageId}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Page ID:</span>
+                          <span className="ml-2 font-mono text-gray-900 dark:text-gray-100">{facebookOAuthData.pageId}</span>
                         </div>
                         <div>
-                          <span className="text-text-secondary">Page Name:</span>
-                          <span className="ml-2 text-text">{facebookOAuthData.pageName}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Page Name:</span>
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">{facebookOAuthData.pageName}</span>
                         </div>
                         <div>
-                          <span className="text-text-secondary">User ID:</span>
-                          <span className="ml-2 font-mono text-text">{facebookOAuthData.userId}</span>
+                          <span className="text-gray-600 dark:text-gray-300">User ID:</span>
+                          <span className="ml-2 font-mono text-gray-900 dark:text-gray-100">{facebookOAuthData.userId}</span>
                         </div>
                         <div>
-                          <span className="text-text-secondary">Email:</span>
-                          <span className="ml-2 text-text">{facebookOAuthData.email}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Email:</span>
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">{facebookOAuthData.email}</span>
                         </div>
                         <div>
-                          <span className="text-text-secondary">Has Pages:</span>
-                          <span className="ml-2 text-text">{facebookOAuthData.hasPages ? 'Yes' : 'No'}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Has Pages:</span>
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">{facebookOAuthData.hasPages ? 'Yes' : 'No'}</span>
                         </div>
                         <div>
-                          <span className="text-text-secondary">Can Post:</span>
-                          <span className="ml-2 text-text">{facebookOAuthData.canPost ? 'Yes' : 'No'}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Can Post:</span>
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">{facebookOAuthData.canPost ? 'Yes' : 'No'}</span>
                         </div>
                       </div>
                       {facebookOAuthData.pages && facebookOAuthData.pages.length > 0 && (
                         <div className="mt-3">
-                          <span className="text-text-secondary text-sm">Available Pages:</span>
+                          <span className="text-gray-600 dark:text-gray-300 text-sm">Available Pages:</span>
                           <div className="mt-1 space-y-1">
                             {facebookOAuthData.pages.map((page: any, index: number) => (
-                              <div key={index} className="text-xs bg-bg-alt p-2 rounded border">
+                              <div key={index} className="text-xs bg-gray-50 dark:bg-gray-700 p-2 rounded border border-gray-200 dark:border-gray-600">
                                 <span className="font-mono">{page.id}</span> - {page.name}
                               </div>
                             ))}
@@ -509,33 +453,33 @@ const CredentialVault: React.FC = () => {
 
                   {/* Facebook Ads Data */}
                   {facebookAdsData && (
-                    <div className="bg-bg border border-error rounded-lg p-4">
-                      <h3 className="font-semibold text-text mb-3 flex items-center">
-                        <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-600 rounded-full flex items-center justify-center mr-3">
+                    <div className="bg-white dark:bg-gray-800 border border-error rounded-lg p-4">
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-3">
                           <span className="text-white font-bold text-sm">$</span>
                         </div>
                         Facebook Ads Credentials
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-text-secondary">Ad Account ID:</span>
-                          <span className="ml-2 font-mono text-text">{facebookAdsData.adAccountId}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Ad Account ID:</span>
+                          <span className="ml-2 font-mono text-gray-900 dark:text-gray-100">{facebookAdsData.adAccountId}</span>
                         </div>
                         <div>
-                          <span className="text-text-secondary">Ad Account Name:</span>
-                          <span className="ml-2 text-text">{facebookAdsData.adAccountName}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Ad Account Name:</span>
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">{facebookAdsData.adAccountName}</span>
                         </div>
                         <div>
-                          <span className="text-text-secondary">Currency:</span>
-                          <span className="ml-2 text-text">{facebookAdsData.currency}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Currency:</span>
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">{facebookAdsData.currency}</span>
                         </div>
                         <div>
-                          <span className="text-text-secondary">Account Status:</span>
-                          <span className="ml-2 text-text">{facebookAdsData.accountStatus}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Account Status:</span>
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">{facebookAdsData.accountStatus}</span>
                         </div>
                         <div>
-                          <span className="text-text-secondary">Can Create Ads:</span>
-                          <span className="ml-2 text-text">{facebookAdsData.canCreateAds ? 'Yes' : 'No'}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Can Create Ads:</span>
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">{facebookAdsData.canCreateAds ? 'Yes' : 'No'}</span>
                         </div>
                       </div>
                     </div>
@@ -543,98 +487,44 @@ const CredentialVault: React.FC = () => {
 
                   {/* Instagram OAuth Data */}
                   {instagramOAuthData && (
-                    <div className="bg-bg border border-accent rounded-lg p-4">
-                      <h3 className="font-semibold text-text mb-3 flex items-center">
-                        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mr-3">
+                    <div className="bg-white dark:bg-gray-800 border border-accent rounded-lg p-4">
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-3">
                           <span className="text-white font-bold text-sm">📷</span>
                         </div>
                         Instagram Business Credentials
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-text-secondary">Instagram User ID:</span>
-                          <span className="ml-2 font-mono text-text">{instagramOAuthData.instagramUserId}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Instagram User ID:</span>
+                          <span className="ml-2 font-mono text-gray-900 dark:text-gray-100">{instagramOAuthData.instagramUserId}</span>
                         </div>
                         <div>
-                          <span className="text-text-secondary">Username:</span>
-                          <span className="ml-2 text-text">@{instagramOAuthData.username}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Username:</span>
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">@{instagramOAuthData.username}</span>
                         </div>
                         <div>
-                          <span className="text-text-secondary">Page ID:</span>
-                          <span className="ml-2 font-mono text-text">{instagramOAuthData.pageId}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Page ID:</span>
+                          <span className="ml-2 font-mono text-gray-900 dark:text-gray-100">{instagramOAuthData.pageId}</span>
                         </div>
                         <div>
-                          <span className="text-text-secondary">Can Post:</span>
-                          <span className="ml-2 text-text">{instagramOAuthData.canPost ? 'Yes' : 'No'}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Can Post:</span>
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">{instagramOAuthData.canPost ? 'Yes' : 'No'}</span>
                         </div>
                       </div>
                     </div>
                   )}
-                </div>
+                  </div>
+                )}
               </div>
             </GlassPanel>
           )}
 
-          {/* OAuth Quick Connect Section */}
-          {true && (
-            <GlassPanel variant="purple" className="animate-slide-in-left">
-              <div className="glass-panel-content">
-                <div className="glass-panel-header">
-                  <div className="flex items-center mb-4">
-                    <Zap className="w-6 h-6 text-primary mr-2 icon-glow" />
-                    <h2 className="glass-panel-title text-xl font-semibold">Connect Social Media Accounts</h2>
-                  </div>
-                </div>
-              <div className="mb-4">
-                <p className="text-text-secondary text-sm mb-2">
-                  Connect your social media accounts for content publishing and analytics. This is separate from your app login.
-                </p>
-                <div className="bg-bg border border-info rounded-lg p-3 shadow-info">
-                  <p className="text-xs text-info">
-                    <strong>Note:</strong> You'll be redirected to the social media platform to authorize access. 
-                    After authorization, you'll be redirected back to this app automatically.
-                  </p>
-                </div>
-              </div>
-              <OAuthLoginButtons 
-                onConnect={(platform) => {
-                  console.log(`Initiating OAuth for ${platform}`);
-                }}
-                className="max-w-md"
-              />
-              
-              {/* Manual Auto-Connect Button */}
-              {currentUser?.providerData.some(provider => 
-                provider.providerId === 'facebook.com' || provider.providerId === 'google.com'
-              ) && (
-                <div className="border-t pt-4 mt-4">
-                  <p className="text-sm text-text-secondary mb-3">
-                    Already logged in with social media? Click below to auto-connect your accounts:
-                  </p>
-                  <button
-                    onClick={handleManualAutoConnect}
-                    disabled={isAutoConnecting}
-                    className="w-full bg-gradient-accent text-primary-contrast px-4 py-2 rounded-lg hover:bg-gradient-reverse disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-violet hover:shadow-violet-strong transition-all duration-250"
-                  >
-                    {isAutoConnecting ? (
-                      <div className="flex items-center justify-center space-x-2">
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        <span>Auto-Connecting...</span>
-                      </div>
-                    ) : (
-                      'Auto-Connect Social Accounts'
-                    )}
-                  </button>
-                </div>
-              )}
-              </div>
-            </GlassPanel>
-          )}
 
           {/* Manual Credential Entry Section */}
           <div className="mb-6 animate-slide-in-right">
-            <h2 className="text-xl font-semibold text-text mb-2 text-glow">Manual Credential Entry</h2>
-            <p className="text-text-secondary text-sm">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2 text-glow">Manual Credential Entry</h2>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
               Alternatively, you can manually enter your access tokens and credentials below.
             </p>
           </div>
@@ -646,7 +536,7 @@ const CredentialVault: React.FC = () => {
               <div className="glass-panel-content">
                 <div className="glass-panel-header">
                   <h2 className="glass-panel-title text-xl font-semibold flex items-center">
-                    <div className="w-6 h-6 bg-gradient-button rounded mr-3 shadow-purple"></div>
+                    <div className="w-6 h-6 bg-primary rounded mr-3"></div>
                     Facebook Page
                   </h2>
                   <p className="glass-panel-subtitle">Connect your Facebook page for content publishing</p>
@@ -654,7 +544,7 @@ const CredentialVault: React.FC = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-text mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Access Token *
                   </label>
                   <div className="relative">
@@ -663,12 +553,12 @@ const CredentialVault: React.FC = () => {
                       value={accessToken}
                       onChange={(e) => setAccessToken(e.target.value)}
                       placeholder="Enter Facebook Access Token"
-                      className="w-full px-3 py-2 bg-bg-alt border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent pr-10 text-sm text-text placeholder-text-muted"
+                      className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent pr-10 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                     />
                     <button
                       type="button"
                       onClick={() => setShowToken(!showToken)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                     >
                       {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -676,14 +566,14 @@ const CredentialVault: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Page ID *
                   </label>
                   {availablePages.length > 0 ? (
                     <select
                       value={pageId}
                       onChange={(e) => setPageId(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                       aria-label="Select Facebook page"
                     >
                       {availablePages.map((page) => (
@@ -698,7 +588,7 @@ const CredentialVault: React.FC = () => {
                       value={pageId}
                       onChange={(e) => setPageId(e.target.value)}
                       placeholder="Enter Facebook Page ID"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                     />
                   )}
                 </div>
@@ -707,8 +597,8 @@ const CredentialVault: React.FC = () => {
                 {validationMessage && (
                   <div className={`p-3 rounded-lg flex items-center text-sm ${
                     validationStatus === 'valid' 
-                      ? 'bg-bg-alt text-success border border-success shadow-success' 
-                      : 'bg-bg-alt text-error border border-error shadow-error'
+                      ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-700' 
+                      : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-700'
                   }`}>
                     {validationStatus === 'valid' ? (
                       <CheckCircle className="w-4 h-4 mr-2" />
@@ -724,7 +614,7 @@ const CredentialVault: React.FC = () => {
                   <button
                     onClick={validateCredentials}
                     disabled={isValidating || !accessToken.trim()}
-                    className="flex-1 bg-gradient-button text-primary-contrast py-2 px-4 rounded-lg hover:bg-gradient-reverse disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-250 font-medium text-sm shadow-purple hover:shadow-purple-strong"
+                    className="flex-1 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-250 font-medium text-sm"
                   >
                     {isValidating ? 'Validating...' : 'Validate'}
                   </button>
@@ -732,7 +622,7 @@ const CredentialVault: React.FC = () => {
                   <button
                     onClick={saveCredentials}
                     disabled={isSaving || !accessToken.trim() || !pageId.trim()}
-                    className="flex-1 bg-gradient-accent text-primary-contrast py-2 px-4 rounded-lg hover:bg-gradient-reverse disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-250 font-medium text-sm shadow-violet hover:shadow-violet-strong"
+                    className="flex-1 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-250 font-medium text-sm"
                   >
                     {isSaving ? 'Saving...' : 'Save'}
                   </button>
@@ -746,7 +636,7 @@ const CredentialVault: React.FC = () => {
               <div className="glass-panel-content">
                 <div className="glass-panel-header">
                   <h2 className="glass-panel-title text-xl font-semibold flex items-center">
-                    <div className="w-6 h-6 bg-gradient-accent rounded mr-3 shadow-violet"></div>
+                    <div className="w-6 h-6 bg-primary rounded mr-3"></div>
                     Instagram Business
                   </h2>
                   <p className="glass-panel-subtitle">Connect your Instagram business account</p>
@@ -754,7 +644,7 @@ const CredentialVault: React.FC = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Access Token *
                   </label>
                   <div className="relative">
@@ -763,12 +653,12 @@ const CredentialVault: React.FC = () => {
                       value={instagramAccessToken}
                       onChange={(e) => setInstagramAccessToken(e.target.value)}
                       placeholder="Enter Instagram Access Token"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-10 text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent pr-10 text-sm"
                     />
                     <button
                       type="button"
                       onClick={() => setShowToken(!showToken)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                     >
                       {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -776,7 +666,7 @@ const CredentialVault: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Business Account ID *
                   </label>
                   <input
@@ -809,7 +699,7 @@ const CredentialVault: React.FC = () => {
                   <button
                     onClick={validateInstagramCredentials}
                     disabled={isValidatingInstagram || !instagramAccessToken.trim()}
-                    className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                    className="flex-1 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
                   >
                     {isValidatingInstagram ? 'Validating...' : 'Validate'}
                   </button>
@@ -817,7 +707,7 @@ const CredentialVault: React.FC = () => {
                   <button
                     onClick={saveInstagramCredentials}
                     disabled={isSavingInstagram || !instagramAccessToken.trim() || !instagramUserId.trim()}
-                    className="flex-1 bg-gradient-to-r from-purple-500 to-pink-600 text-white py-2 px-4 rounded-lg hover:from-purple-600 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                    className="flex-1 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
                   >
                     {isSavingInstagram ? 'Saving...' : 'Save'}
                   </button>
@@ -827,21 +717,22 @@ const CredentialVault: React.FC = () => {
             </GlassPanel>
           </div>
 
-          {/* LinkedIn Credentials */}
-          <GlassPanel variant="default" className="animate-slide-in-left">
-            <div className="glass-panel-content">
-              <div className="glass-panel-header">
-                <h2 className="glass-panel-title text-xl font-semibold flex items-center">
-                  <div className="w-6 h-6 bg-gradient-button rounded mr-3 shadow-purple"></div>
-                  LinkedIn Profile
-                </h2>
-                <p className="glass-panel-subtitle">Connect your LinkedIn profile for professional content</p>
-              </div>
+          {/* LinkedIn and Facebook Ads Credentials - Side by Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* LinkedIn Credentials */}
+            <GlassPanel variant="default" className="animate-slide-in-left">
+              <div className="glass-panel-content">
+                <div className="glass-panel-header">
+                  <h2 className="glass-panel-title text-xl font-semibold flex items-center">
+                      <div className="w-6 h-6 bg-primary rounded mr-3"></div>
+                    LinkedIn Profile
+                  </h2>
+                  <p className="glass-panel-subtitle">Connect your LinkedIn profile for professional content</p>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Access Token *
                   </label>
                   <div className="relative">
@@ -850,12 +741,12 @@ const CredentialVault: React.FC = () => {
                       value={linkedInAccessToken}
                       onChange={(e) => setLinkedInAccessToken(e.target.value)}
                       placeholder="Enter LinkedIn Access Token"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10 text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent pr-10 text-sm"
                     />
                     <button
                       type="button"
                       onClick={() => setShowToken(!showToken)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                     >
                       {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -863,7 +754,7 @@ const CredentialVault: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     User ID *
                   </label>
                   <input
@@ -871,7 +762,7 @@ const CredentialVault: React.FC = () => {
                     value={linkedInUserId}
                     onChange={(e) => setLinkedInUserId(e.target.value)}
                     placeholder="Enter LinkedIn User ID"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                   />
                 </div>
 
@@ -880,7 +771,7 @@ const CredentialVault: React.FC = () => {
                   <button
                     onClick={validateLinkedInCredentials}
                     disabled={isValidatingLinkedIn || !linkedInAccessToken.trim()}
-                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                    className="flex-1 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
                   >
                     {isValidatingLinkedIn ? 'Validating...' : 'Validate'}
                   </button>
@@ -888,20 +779,18 @@ const CredentialVault: React.FC = () => {
                   <button
                     onClick={saveLinkedInCredentials}
                     disabled={isSavingLinkedIn || !linkedInAccessToken.trim() || !linkedInUserId.trim()}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-800 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                    className="flex-1 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
                   >
                     {isSavingLinkedIn ? 'Saving...' : 'Save'}
                   </button>
                 </div>
-              </div>
 
-              <div className="space-y-4">
                 {/* LinkedIn Validation Status */}
                 {linkedInValidationMessage && (
                   <div className={`p-3 rounded-lg flex items-center text-sm ${
                     linkedInValidationStatus === 'valid' 
-                      ? 'bg-green-50 text-green-800 border border-green-200' 
-                      : 'bg-red-50 text-red-800 border border-red-200'
+                      ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-700' 
+                      : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-700'
                   }`}>
                     {linkedInValidationStatus === 'valid' ? (
                       <CheckCircle className="w-4 h-4 mr-2" />
@@ -912,203 +801,206 @@ const CredentialVault: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
-            </div>
-          </GlassPanel>
+              </div>
+            </GlassPanel>
 
-          {/* Facebook Ads Credentials */}
-          <div className="bg-red-50 rounded-xl p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-              <div className="w-6 h-6 bg-gradient-to-r from-red-500 to-pink-600 rounded mr-3"></div>
-              Facebook Ads
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Access Token *</label>
-                  <input
-                    type={showToken ? 'text' : 'password'}
-                    value={adsAccessToken}
-                    onChange={(e) => setAdsAccessToken(e.target.value)}
-                    placeholder="Enter Ads Access Token"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Ad Account ID *</label>
-                  <input
-                    type="text"
-                    value={adsAccountId}
-                    onChange={(e) => setAdsAccountId(e.target.value)}
-                    placeholder="Enter Ad Account ID (act_XXXXXXXXX)"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Default Campaign ID (optional)</label>
-                  <input
-                    type="text"
-                    value={adsCampaignId}
-                    onChange={(e) => setAdsCampaignId(e.target.value)}
-                    placeholder="Enter Campaign ID"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
-                  />
+            {/* Facebook Ads Credentials */}
+            <GlassPanel variant="default" className="animate-slide-in-right">
+              <div className="glass-panel-content">
+                <div className="glass-panel-header">
+                  <h2 className="glass-panel-title text-xl font-semibold flex items-center">
+                    <div className="w-6 h-6 bg-primary rounded mr-3"></div>
+                    Facebook Ads
+                  </h2>
+                  <p className="glass-panel-subtitle">Connect your Facebook Ads account for campaign management</p>
                 </div>
 
-                {adsMessage && (
-                  <div className="p-3 rounded-lg text-sm border bg-white">
-                    <span className="text-gray-800">{adsMessage}</span>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Access Token *</label>
+                    <input
+                      type={showToken ? 'text' : 'password'}
+                      value={adsAccessToken}
+                      onChange={(e) => setAdsAccessToken(e.target.value)}
+                      placeholder="Enter Ads Access Token"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                    />
                   </div>
-                )}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ad Account ID *</label>
+                    <input
+                      type="text"
+                      value={adsAccountId}
+                      onChange={(e) => setAdsAccountId(e.target.value)}
+                      placeholder="Enter Ad Account ID (act_XXXXXXXXX)"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Default Campaign ID (optional)</label>
+                    <input
+                      type="text"
+                      value={adsCampaignId}
+                      onChange={(e) => setAdsCampaignId(e.target.value)}
+                      placeholder="Enter Campaign ID"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                    />
+                  </div>
 
-                <div className="flex space-x-2">
-                  <button
-                    onClick={async () => {
-                      if (!currentUser) return;
-                      if (!adsAccessToken.trim() || !adsAccountId.trim()) {
-                        setAdsMessage('❌ Please enter Access Token and Ad Account ID');
-                        return;
-                      }
-                      setIsSavingAds(true);
-                      setAdsMessage('');
-                      try {
-                        const payload = {
-                          type: 'facebook_ads',
-                          accessToken: adsAccessToken.trim(),
-                          adAccountId: adsAccountId.trim(),
-                          campaignId: adsCampaignId.trim() || undefined,
-                          createdAt: new Date().toISOString(),
-                          lastValidated: new Date().toISOString(),
-                        } as any;
-                        const result = await saveCredential(currentUser.uid, payload);
-                        if (result.success) {
-                          setAdsMessage('✅ Facebook Ads credentials saved!');
-                          await loadSavedCredentials();
-                        } else {
-                          setAdsMessage(`❌ Failed to save: ${result.error || 'Unknown error'}`);
+                  {adsMessage && (
+                    <div className="p-3 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700">
+                      <span className="text-gray-800 dark:text-gray-200">{adsMessage}</span>
+                    </div>
+                  )}
+
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={async () => {
+                        if (!currentUser) return;
+                        if (!adsAccessToken.trim() || !adsAccountId.trim()) {
+                          setAdsMessage('❌ Please enter Access Token and Ad Account ID');
+                          return;
                         }
-                      } catch (e) {
-                        const err = e as Error;
-                        setAdsMessage(`❌ Error: ${err.message}`);
-                      } finally {
-                        setIsSavingAds(false);
-                      }
-                    }}
-                    disabled={isSavingAds}
-                    className="flex-1 bg-gradient-to-r from-red-500 to-pink-600 text-white py-2 px-4 rounded-lg hover:from-red-600 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSavingAds ? 'Saving...' : 'Save'}
-                  </button>
+                        setIsSavingAds(true);
+                        setAdsMessage('');
+                        try {
+                          const payload = {
+                            type: 'facebook_ads',
+                            accessToken: adsAccessToken.trim(),
+                            adAccountId: adsAccountId.trim(),
+                            campaignId: adsCampaignId.trim() || undefined,
+                            createdAt: new Date().toISOString(),
+                            lastValidated: new Date().toISOString(),
+                          } as any;
+                          const result = await saveCredential(currentUser.uid, payload);
+                          if (result.success) {
+                            setAdsMessage('✅ Facebook Ads credentials saved!');
+                            await loadSavedCredentials();
+                          } else {
+                            setAdsMessage(`❌ Failed to save: ${result.error || 'Unknown error'}`);
+                          }
+                        } catch (e) {
+                          const err = e as Error;
+                          setAdsMessage(`❌ Error: ${err.message}`);
+                        } finally {
+                          setIsSavingAds(false);
+                        }
+                      }}
+                      disabled={isSavingAds}
+                      className="flex-1 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSavingAds ? 'Saving...' : 'Save'}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            </GlassPanel>
           </div>
 
           {/* Required Permissions - Organized by Platform */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             {/* Facebook Permissions */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-              <h3 className="text-lg font-semibold text-blue-800 mb-3">Facebook Permissions</h3>
-              <ul className="space-y-2 text-sm text-blue-700">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Facebook Permissions</h3>
+              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                  <code className="bg-blue-100 px-2 py-1 rounded text-xs">pages_show_list</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">pages_show_list</code>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                  <code className="bg-blue-100 px-2 py-1 rounded text-xs">pages_read_engagement</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">pages_read_engagement</code>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                  <code className="bg-blue-100 px-2 py-1 rounded text-xs">pages_manage_posts</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">pages_manage_posts</code>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                  <code className="bg-blue-100 px-2 py-1 rounded text-xs">pages_manage_engagement</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">pages_manage_engagement</code>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                  <code className="bg-blue-100 px-2 py-1 rounded text-xs">ads_management</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">ads_management</code>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                  <code className="bg-blue-100 px-2 py-1 rounded text-xs">ads_read</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">ads_read</code>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                  <code className="bg-blue-100 px-2 py-1 rounded text-xs">business_management</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">business_management</code>
                 </li>
               </ul>
-              <p className="text-xs text-blue-600 mt-3">
-                💡 <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-800">Graph API Explorer</a>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-3">
+                💡 <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary dark:hover:text-primary">Graph API Explorer</a>
               </p>
             </div>
 
             {/* Instagram Permissions */}
-            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-              <h3 className="text-lg font-semibold text-purple-800 mb-3">Instagram Permissions</h3>
-              <ul className="space-y-2 text-sm text-purple-700">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Instagram Permissions</h3>
+              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                  <code className="bg-purple-100 px-2 py-1 rounded text-xs">instagram_basic</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">instagram_basic</code>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                  <code className="bg-purple-100 px-2 py-1 rounded text-xs">instagram_content_publish</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">instagram_content_publish</code>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                  <code className="bg-purple-100 px-2 py-1 rounded text-xs">instagram_manage_insights</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">instagram_manage_insights</code>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                  <code className="bg-purple-100 px-2 py-1 rounded text-xs">instagram_manage_comments</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">instagram_manage_comments</code>
                 </li>
               </ul>
-              <p className="text-xs text-purple-600 mt-3">
-                💡 <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener noreferrer" className="underline hover:text-purple-800">Graph API Explorer</a>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-3">
+                💡 <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary dark:hover:text-primary">Graph API Explorer</a>
               </p>
             </div>
 
             {/* LinkedIn Permissions */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-              <h3 className="text-lg font-semibold text-blue-800 mb-3">LinkedIn Permissions</h3>
-              <ul className="space-y-2 text-sm text-blue-700">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">LinkedIn Permissions</h3>
+              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                  <code className="bg-blue-100 px-2 py-1 rounded text-xs">r_liteprofile</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">r_liteprofile</code>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                  <code className="bg-blue-100 px-2 py-1 rounded text-xs">w_member_social</code>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs text-gray-800 dark:text-gray-200">w_member_social</code>
                 </li>
               </ul>
-              <p className="text-xs text-blue-600 mt-3">
-                💡 <a href="https://www.linkedin.com/developers/" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-800">LinkedIn Developer Portal</a>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-3">
+                💡 <a href="https://www.linkedin.com/developers/" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary dark:hover:text-primary">LinkedIn Developer Portal</a>
               </p>
             </div>
           </div>
 
           {/* Facebook Ads Permissions */}
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-red-800 mb-3">Facebook Ads Permissions</h3>
-            <ul className="space-y-2 text-sm text-red-700">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Facebook Ads Permissions</h3>
+            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
               <li className="flex items-center">
-                <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
-                <code className="bg-red-100 px-2 py-1 rounded">ads_management</code> - To create and manage ads
+                <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-gray-800 dark:text-gray-200">ads_management</code> - To create and manage ads
               </li>
               <li className="flex items-center">
-                <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
-                <code className="bg-red-100 px-2 py-1 rounded">ads_read</code> - To read ad performance data
+                <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-gray-800 dark:text-gray-200">ads_read</code> - To read ad performance data
               </li>
               <li className="flex items-center">
-                <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
-                <code className="bg-red-100 px-2 py-1 rounded">pages_show_list</code> - To access connected pages
+                <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-gray-800 dark:text-gray-200">pages_show_list</code> - To access connected pages
               </li>
             </ul>
-            <p className="text-sm text-red-600 mt-4">
-              💡 Get your Ad Account ID from <a href="https://business.facebook.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-red-800">Facebook Business Manager</a>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
+              💡 Get your Ad Account ID from <a href="https://business.facebook.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary dark:hover:text-primary">Facebook Business Manager</a>
             </p>
           </div>
         </div>

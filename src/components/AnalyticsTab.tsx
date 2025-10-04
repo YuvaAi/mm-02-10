@@ -267,18 +267,18 @@ const AnalyticsTab: React.FC = () => {
 
   // Debug panel for development
   const DebugPanel = () => (
-    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4 mb-6">
       <div className="flex items-center justify-between mb-2">
-        <h4 className="font-semibold text-yellow-800">🔍 Debug Information</h4>
+        <h4 className="font-semibold text-gray-900 dark:text-gray-100">🔍 Debug Information</h4>
         <button
           onClick={handleRefresh}
           disabled={loading}
-          className="px-3 py-1 text-xs bg-yellow-200 hover:bg-yellow-300 rounded transition-colors disabled:opacity-50"
+          className="px-3 py-1 text-xs bg-primary hover:bg-primary-dark text-white rounded transition-colors disabled:opacity-50"
         >
           {loading ? 'Refreshing...' : 'Refresh Data'}
         </button>
       </div>
-      <div className="text-sm text-yellow-700 space-y-1">
+      <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
         <p>Data source: <span className="font-medium">{debugInfo.source || 'unknown'}</span></p>
         <p>Posts found: {debugInfo.postsCount || 0}</p>
         <p>Credentials found: {debugInfo.credentialsCount || 0}</p>
@@ -299,8 +299,8 @@ const AnalyticsTab: React.FC = () => {
         
         {debugInfo.posts && debugInfo.posts.length > 0 && (
           <details className="mt-2">
-            <summary className="cursor-pointer">Sample Posts</summary>
-            <pre className="text-xs mt-1 bg-yellow-100 p-2 rounded max-h-32 overflow-auto">
+            <summary className="cursor-pointer text-gray-700 dark:text-gray-300">Sample Posts</summary>
+            <pre className="text-xs mt-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded max-h-32 overflow-auto">
               {JSON.stringify(debugInfo.posts, null, 2)}
             </pre>
           </details>
@@ -374,8 +374,8 @@ const AnalyticsTab: React.FC = () => {
               onClick={() => setTimeRange(range)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-250 ${
                 timeRange === range
-                  ? 'bg-gradient-button text-primary-contrast shadow-purple'
-                  : 'bg-bg-alt text-text-secondary hover:bg-bg-secondary border border-border hover:shadow-purple'
+                  ? 'bg-primary text-white'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
               }`}
             >
               {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : '90 Days'}
@@ -409,14 +409,14 @@ const AnalyticsTab: React.FC = () => {
           </div>
         </GlassPanel>
 
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg transform hover:scale-105 transition-transform">
+        <div className="bg-primary rounded-xl p-6 text-white shadow-lg transform hover:scale-105 transition-transform">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-100 text-sm font-medium">Total Reach</p>
+              <p className="text-white text-sm font-medium">Total Reach</p>
               <p className="text-3xl font-bold">
                 {metrics.reduce((sum, m) => sum + m.reach, 0).toLocaleString()}
               </p>
-              <p className="text-green-200 text-xs mt-1">
+              <p className="text-white text-xs mt-1">
                 {filteredTimeSeriesData.length > 1 && (
                   <span className="flex items-center">
                     <Users className="w-3 h-3 mr-1" />
@@ -430,14 +430,14 @@ const AnalyticsTab: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg transform hover:scale-105 transition-transform">
+        <div className="bg-primary rounded-xl p-6 text-white shadow-lg transform hover:scale-105 transition-transform">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-100 text-sm font-medium">Total Engagement</p>
+              <p className="text-white text-sm font-medium">Total Engagement</p>
               <p className="text-3xl font-bold">
                 {metrics.reduce((sum, m) => sum + m.engagement, 0).toLocaleString()}
               </p>
-              <p className="text-purple-200 text-xs mt-1">
+              <p className="text-white text-xs mt-1">
                 {filteredTimeSeriesData.length > 1 && (
                   <span className="flex items-center">
                     <Heart className="w-3 h-3 mr-1" />
@@ -451,14 +451,14 @@ const AnalyticsTab: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg transform hover:scale-105 transition-transform">
+        <div className="bg-primary rounded-xl p-6 text-white shadow-lg transform hover:scale-105 transition-transform">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-100 text-sm font-medium">Avg Engagement Rate</p>
+              <p className="text-white text-sm font-medium">Avg Engagement Rate</p>
               <p className="text-3xl font-bold">
                 {(metrics.reduce((sum, m) => sum + (m.reach > 0 ? (m.engagement / m.reach) * 100 : 0), 0) / metrics.length).toFixed(1)}%
               </p>
-              <p className="text-orange-200 text-xs mt-1">
+              <p className="text-white text-xs mt-1">
                 <span className="flex items-center">
                   <Target className="w-3 h-3 mr-1" />
                   {metrics.length} posts analyzed
@@ -595,14 +595,14 @@ const AnalyticsTab: React.FC = () => {
 
       {/* Trending Posts */}
       {trendingPosts.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-lg p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
           <div className="flex items-center mb-6">
             <TrendingUp className="w-6 h-6 text-green-500 mr-3" />
-            <h3 className="text-xl font-bold text-gray-900">Top Performing Posts</h3>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Top Performing Posts</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {trendingPosts.map((post, index) => (
-              <div key={post.postId} className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 border border-gray-200 hover:shadow-lg transition-shadow">
+              <div key={post.postId} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-600 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-medium text-gray-500 uppercase">{post.platform}</span>
                   <div className="flex items-center text-green-600">

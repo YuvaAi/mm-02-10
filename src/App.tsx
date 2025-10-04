@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './Contexts/AuthContext';
+import { ThemeProvider } from './Contexts/ThemeContext';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import OAuthCallback from './components/OAuthCallback';
@@ -25,9 +26,10 @@ const LoadingSpinner = () => (
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route 
@@ -105,9 +107,10 @@ function App() {
             } 
           />
           <Route path="/" element={<Navigate to="/login" />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
