@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './Contexts/AuthContext';
 import { ThemeProvider } from './Contexts/ThemeContext';
+import { ContentGeneratorProvider } from './Contexts/ContentGeneratorContext';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import OAuthCallback from './components/OAuthCallback';
@@ -28,10 +29,11 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Router>
-          <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+        <ContentGeneratorProvider>
+          <Router>
+            <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
           <Route 
             path="/dashboard" 
             element={
@@ -106,9 +108,10 @@ function App() {
               </PrivateRoute>
             } 
           />
-          <Route path="/" element={<Navigate to="/login" />} />
-          </Routes>
-        </Router>
+            <Route path="/" element={<Navigate to="/login" />} />
+            </Routes>
+          </Router>
+        </ContentGeneratorProvider>
       </AuthProvider>
     </ThemeProvider>
   );

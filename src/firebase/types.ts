@@ -25,4 +25,13 @@ export interface UserCredentials {
   instagramUserId?: string;
   // LinkedIn specific fields
   linkedInUserId?: string;
+  linkedInPageId?: string;
+  linkedInPageName?: string;
+  hasOrganizationPages?: boolean;
+  organizationPages?: Array<{
+    id: string;
+    name: string;
+    vanityName?: string;
+    role: string;
+  }>;
 }

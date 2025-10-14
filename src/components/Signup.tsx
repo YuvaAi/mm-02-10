@@ -56,8 +56,8 @@ const Signup: React.FC = () => {
               <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4 shadow-turquoise hover:shadow-turquoise-strong transition-all duration-300 hover:scale-110">
                 <UserPlus className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-3xl font-bold text-text mb-2 text-glow">Create Account</h2>
-              <p className="text-text-secondary">Join MarketMate today</p>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 text-glow">Create Account</h2>
+              <p className="text-text-secondary dark:text-gray-400">Join MarketMate today</p>
             </div>
 
             {error && (

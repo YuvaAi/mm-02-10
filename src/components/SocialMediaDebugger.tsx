@@ -175,15 +175,15 @@ const SocialMediaDebugger: React.FC = () => {
           <p className="text-yellow-700 text-lg">This shows ALL social media credentials (Facebook, Instagram, Google)</p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h4 className="text-xl font-bold text-gray-900 mb-4">
+        <div className="bg-bg-alt dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+          <h4 className="text-xl font-bold text-text dark:text-gray-100 mb-4">
             📊 Stored Credentials ({allCredentials.length})
           </h4>
           
           {loading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading credentials...</p>
+              <p className="mt-4 text-text-secondary dark:text-gray-400">Loading credentials...</p>
             </div>
           ) : allCredentials.length > 0 ? (
             <div className="space-y-4">

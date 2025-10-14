@@ -216,10 +216,10 @@ const AnalyticsTab: React.FC = () => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold text-gray-800">{`${label}`}</p>
+        <div className="bg-bg-alt dark:bg-gray-800 p-4 border border-border-purple dark:border-gray-600 rounded-lg shadow-lg">
+          <p className="font-semibold text-text dark:text-gray-200">{`${label}`}</p>
           {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-sm" data-color={entry.color}>
+            <p key={index} className="text-sm text-text dark:text-gray-300" data-color={entry.color}>
               {`${entry.name}: ${entry.value.toLocaleString()}`}
             </p>
           ))}
@@ -269,7 +269,7 @@ const AnalyticsTab: React.FC = () => {
   const DebugPanel = () => (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4 mb-6">
       <div className="flex items-center justify-between mb-2">
-        <h4 className="font-semibold text-gray-900 dark:text-gray-100">🔍 Debug Information</h4>
+        <h4 className="font-semibold text-text dark:text-gray-100">🔍 Debug Information</h4>
         <button
           onClick={handleRefresh}
           disabled={loading}
@@ -299,7 +299,7 @@ const AnalyticsTab: React.FC = () => {
         
         {debugInfo.posts && debugInfo.posts.length > 0 && (
           <details className="mt-2">
-            <summary className="cursor-pointer text-gray-700 dark:text-gray-300">Sample Posts</summary>
+            <summary className="cursor-pointer text-text dark:text-gray-300">Sample Posts</summary>
             <pre className="text-xs mt-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded max-h-32 overflow-auto">
               {JSON.stringify(debugInfo.posts, null, 2)}
             </pre>
@@ -472,11 +472,11 @@ const AnalyticsTab: React.FC = () => {
 
       {/* Performance Trends with Spikes */}
       {filteredTimeSeriesData.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-lg p-6">
+        <div className="bg-bg-alt dark:bg-gray-800 rounded-2xl shadow-lg p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
               <TrendingUp className="w-6 h-6 text-indigo-600 mr-3" />
-              <h3 className="text-xl font-bold text-gray-900">Performance Trends & Spikes</h3>
+              <h3 className="text-xl font-bold text-text dark:text-gray-100">Performance Trends & Spikes</h3>
             </div>
             {performanceSpikes.length > 0 && (
               <div className="flex items-center text-green-600">
@@ -524,10 +524,10 @@ const AnalyticsTab: React.FC = () => {
       {/* Platform Performance Comparison */}
       {platformComparison.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="bg-bg-alt dark:bg-gray-800 rounded-2xl shadow-lg p-6">
             <div className="flex items-center mb-6">
               <BarChart3 className="w-6 h-6 text-blue-500 mr-3" />
-              <h3 className="text-xl font-bold text-gray-900">Platform Performance</h3>
+              <h3 className="text-xl font-bold text-text dark:text-gray-100">Platform Performance</h3>
             </div>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
@@ -559,10 +559,10 @@ const AnalyticsTab: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="bg-bg-alt dark:bg-gray-800 rounded-2xl shadow-lg p-6">
             <div className="flex items-center mb-6">
               <Award className="w-6 h-6 text-purple-500 mr-3" />
-              <h3 className="text-xl font-bold text-gray-900">Engagement Rate by Platform</h3>
+              <h3 className="text-xl font-bold text-text dark:text-gray-100">Engagement Rate by Platform</h3>
             </div>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
@@ -620,17 +620,17 @@ const AnalyticsTab: React.FC = () => {
                     }}
                   />
                 )}
-                <p className="text-sm text-gray-700 mb-3 line-clamp-2">
+                <p className="text-sm text-text dark:text-gray-300 mb-3 line-clamp-2">
                   {post.content || 'No content available'}
                 </p>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="text-center">
-                    <p className="font-semibold text-gray-900">{post.impressions.toLocaleString()}</p>
-                    <p className="text-gray-500">Impressions</p>
+                    <p className="font-semibold text-text dark:text-gray-100">{post.impressions.toLocaleString()}</p>
+                    <p className="text-text-secondary dark:text-gray-400">Impressions</p>
                   </div>
                   <div className="text-center">
                     <p className="font-semibold text-green-600">{post.engagementRate.toFixed(1)}%</p>
-                    <p className="text-gray-500">Engagement</p>
+                    <p className="text-text-secondary dark:text-gray-400">Engagement</p>
                   </div>
                 </div>
               </div>
@@ -640,10 +640,10 @@ const AnalyticsTab: React.FC = () => {
       )}
 
       {/* Engagement Funnel */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
+      <div className="bg-bg-alt dark:bg-gray-800 rounded-2xl shadow-lg p-6">
         <div className="flex items-center mb-6">
           <Activity className="w-6 h-6 text-indigo-500 mr-3" />
-          <h3 className="text-xl font-bold text-gray-900">Engagement Funnel</h3>
+          <h3 className="text-xl font-bold text-text dark:text-gray-100">Engagement Funnel</h3>
         </div>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">

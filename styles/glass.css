@@ -183,6 +183,43 @@
   color: #A1A1AA;
 }
 
+/* Glass Panel Input Styling */
+.glass-panel-input {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(54, 109, 116, 0.3) !important;
+  color: #1F2937 !important;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.glass-panel-input:focus {
+  background: rgba(255, 255, 255, 1) !important;
+  border: 1px solid rgba(54, 109, 116, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(54, 109, 116, 0.1) !important;
+  outline: none;
+}
+
+.glass-panel-input::placeholder {
+  color: #A1A1AA !important;
+}
+
+/* Dark mode glass panel input */
+.dark .glass-panel-input {
+  background: rgba(55, 65, 81, 0.9) !important;
+  border: 1px solid rgba(75, 85, 99, 0.6) !important;
+  color: #F9FAFB !important;
+}
+
+.dark .glass-panel-input:focus {
+  background: rgba(55, 65, 81, 1) !important;
+  border: 1px solid rgba(75, 85, 99, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(75, 85, 99, 0.2) !important;
+}
+
+.dark .glass-panel-input::placeholder {
+  color: #9CA3AF !important;
+}
+
 /* Glass Panel Labels */
 .glass-panel label {
   color: #F9FAFB;

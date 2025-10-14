@@ -7,6 +7,9 @@ import HistoryTab from './HistoryTab';
 import ServiceLogos from './ServiceLogos';
 import CredentialVault from './CredentialVault';
 import OAuthSidebar from './OAuthSidebar';
+import FacebookAdGenerator from './FacebookAdGenerator';
+import ContentPromptBar from './ContentPromptBar';
+import ContentPreviewAndPublish from './ContentPreviewAndPublish';
 import { useAuth } from '../Contexts/AuthContext';
 import { useTheme } from '../Contexts/ThemeContext';
 import { logOut } from '../firebase/auth';
@@ -32,11 +35,7 @@ const Dashboard: React.FC = () => {
     navigate('/credential-vault');
   };
 
-  const handleFacebookAdsClick = () => {
-    navigate('/facebook-ads');
-  };
-
-  const [activeTab, setActiveTab] = useState<'main' | 'analytics' | 'history' | 'debug' | 'vault'>('main');
+  const [activeTab, setActiveTab] = useState<'main' | 'ads' | 'analytics' | 'history' | 'debug' | 'vault'>('main');
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
@@ -85,48 +84,58 @@ const Dashboard: React.FC = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation Tabs */}
-        <div className="mb-6 sm:mb-8 flex items-center space-x-3">
-          <button aria-label="Overview"
-            onClick={() => setActiveTab('main')}
-            className={`px-6 py-3 rounded-lg text-base font-medium border flex items-center space-x-3 transition-all duration-250 min-w-[140px] ${activeTab === 'main' ? 'bg-bg-alt dark:bg-gray-800 border-border-turquoise dark:border-gray-600 shadow-sm shadow-turquoise text-text dark:text-gray-100' : 'text-text-secondary dark:text-gray-300 hover:bg-bg-alt dark:hover:bg-gray-800 border-border dark:border-gray-700 hover:shadow-turquoise'}`}
-          >
-            <Globe className="w-5 h-5" />
-            <span>Overview</span>
-          </button>
-          <button aria-label="Analytics"
-            onClick={() => setActiveTab('analytics')}
-            className={`px-6 py-3 rounded-lg text-base font-medium border flex items-center space-x-3 transition-colors min-w-[140px] ${activeTab === 'analytics' ? 'bg-bg-secondary dark:bg-gray-800 border-border dark:border-gray-600 shadow-sm text-text dark:text-gray-100' : 'text-text-secondary dark:text-gray-300 hover:bg-bg-secondary dark:hover:bg-gray-800 border-border dark:border-gray-700'}`}
-          >
-            <Activity className="w-5 h-5" />
-            <span>Analytics</span>
-          </button>
-          <button aria-label="History"
-            onClick={() => setActiveTab('history')}
-            className={`px-6 py-3 rounded-lg text-base font-medium border flex items-center space-x-3 transition-colors min-w-[140px] ${activeTab === 'history' ? 'bg-bg-secondary dark:bg-gray-800 border-border dark:border-gray-600 shadow-sm text-text dark:text-gray-100' : 'text-text-secondary dark:text-gray-300 hover:bg-bg-secondary dark:hover:bg-gray-800 border-border dark:border-gray-700'}`}
-          >
-            <Clock className="w-5 h-5" />
-            <span>History</span>
-          </button>
-          <button aria-label="Debug"
-            onClick={() => setActiveTab('debug')}
-            className={`px-6 py-3 rounded-lg text-base font-medium border flex items-center space-x-3 transition-colors min-w-[140px] ${activeTab === 'debug' ? 'bg-bg-secondary dark:bg-gray-800 border-border dark:border-gray-600 shadow-sm text-text dark:text-gray-100' : 'text-text-secondary dark:text-gray-300 hover:bg-bg-secondary dark:hover:bg-gray-800 border-border dark:border-gray-700'}`}
-          >
-            <Zap className="w-5 h-5" />
-            <span>Debug</span>
-          </button>
-          <button aria-label="Vault"
-            onClick={() => setActiveTab('vault')}
-            className={`px-6 py-3 rounded-lg text-base font-medium border flex items-center space-x-3 transition-colors min-w-[140px] ${activeTab === 'vault' ? 'bg-bg-secondary dark:bg-gray-800 border-border dark:border-gray-600 shadow-sm text-text dark:text-gray-100' : 'text-text-secondary dark:text-gray-300 hover:bg-bg-secondary dark:hover:bg-gray-800 border-border dark:border-gray-700'}`}
-          >
-            <Lock className="w-5 h-5" />
-            <span>Vault</span>
-          </button>
+        <div className="mb-6 sm:mb-8 flex justify-center">
+          <div className="flex items-center gap-4">
+            <button aria-label="Overview"
+              onClick={() => setActiveTab('main')}
+              className={`px-8 py-4 rounded-xl text-lg font-medium border flex items-center space-x-3 transition-all duration-250 min-w-[160px] shadow-lg hover:shadow-xl backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-gray-200 dark:border-gray-600 ${activeTab === 'main' ? 'bg-primary/10 border-primary dark:border-primary shadow-primary/20 text-primary dark:text-primary' : 'text-text-secondary dark:text-gray-300 hover:bg-white/90 dark:hover:bg-gray-700/80 border-gray-300 dark:border-gray-500 hover:shadow-lg'}`}
+            >
+              <Globe className="w-6 h-6" />
+              <span>Overview</span>
+            </button>
+            <button aria-label="Ads"
+              onClick={() => setActiveTab('ads')}
+              className={`px-8 py-4 rounded-xl text-lg font-medium border flex items-center space-x-3 transition-all duration-250 min-w-[160px] shadow-lg hover:shadow-xl backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-gray-200 dark:border-gray-600 ${activeTab === 'ads' ? 'bg-primary/10 border-primary dark:border-primary shadow-primary/20 text-primary dark:text-primary' : 'text-text-secondary dark:text-gray-300 hover:bg-white/90 dark:hover:bg-gray-700/80 border-gray-300 dark:border-gray-500 hover:shadow-lg'}`}
+            >
+              <Target className="w-6 h-6" />
+              <span>Ads</span>
+            </button>
+            <button aria-label="Analytics"
+              onClick={() => setActiveTab('analytics')}
+              className={`px-8 py-4 rounded-xl text-lg font-medium border flex items-center space-x-3 transition-all duration-250 min-w-[160px] shadow-lg hover:shadow-xl backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-gray-200 dark:border-gray-600 ${activeTab === 'analytics' ? 'bg-primary/10 border-primary dark:border-primary shadow-primary/20 text-primary dark:text-primary' : 'text-text-secondary dark:text-gray-300 hover:bg-white/90 dark:hover:bg-gray-700/80 border-gray-300 dark:border-gray-500 hover:shadow-lg'}`}
+            >
+              <Activity className="w-6 h-6" />
+              <span>Analytics</span>
+            </button>
+            <button aria-label="History"
+              onClick={() => setActiveTab('history')}
+              className={`px-8 py-4 rounded-xl text-lg font-medium border flex items-center space-x-3 transition-all duration-250 min-w-[160px] shadow-lg hover:shadow-xl backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-gray-200 dark:border-gray-600 ${activeTab === 'history' ? 'bg-primary/10 border-primary dark:border-primary shadow-primary/20 text-primary dark:text-primary' : 'text-text-secondary dark:text-gray-300 hover:bg-white/90 dark:hover:bg-gray-700/80 border-gray-300 dark:border-gray-500 hover:shadow-lg'}`}
+            >
+              <Clock className="w-6 h-6" />
+              <span>History</span>
+            </button>
+            <button aria-label="Debug"
+              onClick={() => setActiveTab('debug')}
+              className={`px-8 py-4 rounded-xl text-lg font-medium border flex items-center space-x-3 transition-all duration-250 min-w-[160px] shadow-lg hover:shadow-xl backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-gray-200 dark:border-gray-600 ${activeTab === 'debug' ? 'bg-primary/10 border-primary dark:border-primary shadow-primary/20 text-primary dark:text-primary' : 'text-text-secondary dark:text-gray-300 hover:bg-white/90 dark:hover:bg-gray-700/80 border-gray-300 dark:border-gray-500 hover:shadow-lg'}`}
+            >
+              <Zap className="w-6 h-6" />
+              <span>Debug</span>
+            </button>
+            <button aria-label="Vault"
+              onClick={() => setActiveTab('vault')}
+              className={`px-8 py-4 rounded-xl text-lg font-medium border flex items-center space-x-3 transition-all duration-250 min-w-[160px] shadow-lg hover:shadow-xl backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-gray-200 dark:border-gray-600 ${activeTab === 'vault' ? 'bg-primary/10 border-primary dark:border-primary shadow-primary/20 text-primary dark:text-primary' : 'text-text-secondary dark:text-gray-300 hover:bg-white/90 dark:hover:bg-gray-700/80 border-gray-300 dark:border-gray-500 hover:shadow-lg'}`}
+            >
+              <Lock className="w-6 h-6" />
+              <span>Vault</span>
+            </button>
+          </div>
         </div>
 
-        {/* Two-Column Layout */}
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Main Content Column */}
-          <div className="flex-1">
+        {/* Two-Column Layout - Only for Overview tab */}
+        {activeTab === 'main' ? (
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Main Content Column */}
+            <div className="flex-1">
         {activeTab === 'main' && (
           <>
             {/* Centered Headline - Only shown in Overview tab */}
@@ -138,57 +147,14 @@ const Dashboard: React.FC = () => {
                 AI-powered ads that save you time and maximize impact.
               </p>
             </div>
+
+            {/* Unified Content Generation Section */}
+            <div className="mb-8 space-y-6">
+              <ContentPromptBar />
+              <ContentPreviewAndPublish />
+            </div>
+
                  <div className="space-y-6 sm:space-y-8">
-                   {/* Main Cards Row */}
-                   <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 sm:gap-6 mt-6 sm:mt-8">
-                     {/* Content Creation Section */}
-                     <GlassPanel variant="accent" className="animate-slide-in-left" padding="md">
-                       <div className="glass-panel-content">
-                         <div className="glass-panel-header" style={{ paddingBottom: '0.5rem', marginBottom: '0.75rem' }}>
-                           <div className="flex items-center space-x-2 mb-1">
-                             <div className="w-5 h-5 bg-primary rounded-lg flex items-center justify-center shadow-turquoise">
-                               <Sparkles className="w-3 h-3 text-white" />
-                             </div>
-                             <h3 className="glass-panel-title text-base font-bold">Content Creation</h3>
-                           </div>
-                           <p className="glass-panel-subtitle text-xs">Generate and publish content across social media platforms</p>
-                         </div>
-              <div className="space-y-1.5">
-                <button
-                  onClick={handleFacebookClick}
-                  className="w-full flex items-center justify-center space-x-2 bg-primary hover:bg-primary-dark text-white py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong focus:ring-3 focus:ring-primary focus:ring-opacity-50"
-                >
-                  <Facebook className="w-4 h-4" />
-                  <span>Facebook Posts</span>
-                </button>
-                
-                <button
-                  onClick={handleFacebookAdsClick}
-                  className="w-full flex items-center justify-center space-x-2 bg-primary hover:bg-primary-dark text-white py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong focus:ring-3 focus:ring-primary focus:ring-opacity-50"
-                >
-                  <Target className="w-4 h-4" />
-                  <span>Facebook Ads</span>
-                </button>
-                
-                <button
-                  onClick={() => navigate('/instagram-content')}
-                  className="w-full flex items-center justify-center space-x-2 bg-primary hover:bg-primary-dark text-white py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong focus:ring-3 focus:ring-primary focus:ring-opacity-50"
-                >
-                  <Instagram className="w-4 h-4" />
-                  <span>Instagram</span>
-                </button>
-                
-                <button
-                  onClick={() => navigate('/linkedin-content')}
-                  className="w-full flex items-center justify-center space-x-2 bg-primary hover:bg-primary-dark text-white py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-turquoise hover:shadow-turquoise-strong focus:ring-3 focus:ring-primary focus:ring-opacity-50"
-                >
-                  <Linkedin className="w-4 h-4" />
-                  <span>LinkedIn</span>
-                </button>
-                       </div>
-                     </div>
-                     </GlassPanel>
-                   </div>
 
                    {/* Service Partners Section */}
                    <div className="mt-6 sm:mt-8">
@@ -199,49 +165,59 @@ const Dashboard: React.FC = () => {
                  </div>
           </>
         )}
+            </div>
 
-        {activeTab === 'analytics' && (
-          <GlassPanel variant="accent" className="animate-fade-in">
-            <div className="glass-panel-content">
-              <div className="glass-panel-header">
-                <h3 className="glass-panel-title text-xl font-bold mb-2">Post Analytics</h3>
-                <p className="glass-panel-subtitle">Track performance and engagement across all platforms</p>
+            {/* Right Sidebar - OAuth Cards - Only in Overview */}
+            <div className="lg:w-[300px] lg:flex-shrink-0">
+              <div className="lg:sticky lg:top-24">
+                <OAuthSidebar />
               </div>
-              <AnalyticsTab />
             </div>
-          </GlassPanel>
-        )}
-
-        {activeTab === 'history' && (
-          <HistoryTab />
-        )}
-
-        {activeTab === 'debug' && (
-          <GlassPanel variant="accent" className="animate-fade-in">
-            <div className="glass-panel-content">
-              <div className="glass-panel-header">
-                <h3 className="glass-panel-title text-xl font-bold mb-2">Debug Tools</h3>
-                <p className="glass-panel-subtitle">Diagnose and troubleshoot social media connections</p>
+          </div>
+        ) : (
+          /* Single Column Layout for other tabs */
+          <div className="max-w-4xl mx-auto">
+            {activeTab === 'ads' && (
+              <div className="animate-fade-in">
+                <FacebookAdGenerator />
               </div>
-              <SocialMediaDebugger />
-            </div>
-          </GlassPanel>
-        )}
+            )}
 
-        {activeTab === 'vault' && (
-          <div className="mt-6">
-            <CredentialVault />
+            {activeTab === 'analytics' && (
+              <GlassPanel variant="accent" className="animate-fade-in">
+                <div className="glass-panel-content">
+                  <div className="glass-panel-header">
+                    <h3 className="glass-panel-title text-xl font-bold mb-2">Post Analytics</h3>
+                    <p className="glass-panel-subtitle">Track performance and engagement across all platforms</p>
+                  </div>
+                  <AnalyticsTab />
+                </div>
+              </GlassPanel>
+            )}
+
+            {activeTab === 'history' && (
+              <HistoryTab />
+            )}
+
+            {activeTab === 'debug' && (
+              <GlassPanel variant="accent" className="animate-fade-in">
+                <div className="glass-panel-content">
+                  <div className="glass-panel-header">
+                    <h3 className="glass-panel-title text-xl font-bold mb-2">Debug Tools</h3>
+                    <p className="glass-panel-subtitle">Diagnose and troubleshoot social media connections</p>
+                  </div>
+                  <SocialMediaDebugger />
+                </div>
+              </GlassPanel>
+            )}
+
+            {activeTab === 'vault' && (
+              <div className="mt-6">
+                <CredentialVault />
+              </div>
+            )}
           </div>
         )}
-          </div>
-
-          {/* Right Sidebar - OAuth Cards */}
-          <div className="lg:w-[300px] lg:flex-shrink-0">
-            <div className="lg:sticky lg:top-24">
-              <OAuthSidebar />
-            </div>
-          </div>
-        </div>
       </main>
     </div>
   );

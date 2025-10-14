@@ -990,22 +990,22 @@ const FacebookAdGenerator: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-main animate-gradient">
-      <header className="bg-bg-alt shadow-sm border-b border-border-purple shadow-purple sticky top-0 z-50">
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+      <header className="bg-bg-alt dark:bg-gray-800 shadow-sm border-b border-border-turquoise dark:border-gray-700 shadow-turquoise sticky top-0 z-50 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
             <button
               onClick={() => navigate('/dashboard')}
-              className="flex items-center space-x-2 text-text-secondary hover:text-text transition-all duration-250 mr-6 hover:bg-bg-secondary px-3 py-2 rounded-lg"
+              className="flex items-center space-x-2 text-text-secondary dark:text-gray-300 hover:text-text dark:hover:text-gray-100 transition-all duration-250 mr-6 hover:bg-bg-secondary dark:hover:bg-gray-700 px-3 py-2 rounded-lg"
             >
               <ArrowLeft className="w-5 h-5" />
               <span>Back to Dashboard</span>
             </button>
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-gradient-button rounded-lg flex items-center justify-center mr-3 shadow-purple hover:shadow-purple-strong transition-all duration-250 hover:scale-110">
+              <div className="w-8 h-8 bg-gradient-button rounded-lg flex items-center justify-center mr-3 shadow-turquoise hover:shadow-turquoise-strong transition-all duration-250 hover:scale-110">
                 <Target className="w-5 h-5 text-primary-contrast" />
               </div>
-              <h1 className="text-xl font-bold text-text text-glow">Facebook Ad Generator</h1>
+              <h1 className="text-xl font-bold text-text dark:text-gray-100 text-glow">Facebook Ad Generator</h1>
             </div>
           </div>
         </div>
@@ -1013,12 +1013,12 @@ const FacebookAdGenerator: React.FC = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 animate-slide-in-top">
-          <h2 className="text-3xl font-bold text-text mb-2 text-glow">Create High-Converting Facebook Ads</h2>
-          <p className="text-text-secondary">Generate optimized ad copy, hashtags, and create Facebook ad campaigns with targeting.</p>
+          <h2 className="text-3xl font-bold text-text dark:text-gray-100 mb-2 text-glow">Create High-Converting Facebook Ads</h2>
+          <p className="text-text-secondary dark:text-gray-300">Generate optimized ad copy, hashtags, and create Facebook ad campaigns with targeting.</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 rounded-lg border bg-bg-alt border-error shadow-error">
+          <div className="mb-6 p-4 rounded-lg border bg-bg-alt dark:bg-gray-800 border-error dark:border-red-500 shadow-error">
             <div className="flex items-center space-x-2">
               <AlertCircle className="w-5 h-5 text-error" />
               <p className="text-sm font-medium text-error">{error}</p>
@@ -1027,7 +1027,7 @@ const FacebookAdGenerator: React.FC = () => {
         )}
 
         {successMessage && (
-          <div className="mb-6 p-4 rounded-lg border bg-bg-alt border-success shadow-success">
+          <div className="mb-6 p-4 rounded-lg border bg-bg-alt dark:bg-gray-800 border-success dark:border-green-500 shadow-success">
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-5 h-5 text-success" />
               <p className="text-sm font-medium text-success">{successMessage}</p>
@@ -1039,20 +1039,20 @@ const FacebookAdGenerator: React.FC = () => {
           {/* Input Form */}
           <div className="lg:col-span-1 space-y-6">
             {/* Content Generation Form */}
-            <div className="bg-bg-alt rounded-xl shadow-md shadow-purple border border-border-purple p-6 hover:shadow-purple-strong transition-all duration-250 animate-slide-in-left">
+            <div className="bg-bg-alt dark:bg-gray-800 rounded-xl shadow-md shadow-turquoise border border-border-turquoise dark:border-gray-600 p-6 hover:shadow-turquoise-strong transition-all duration-250 animate-slide-in-left">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-button rounded-lg flex items-center justify-center shadow-purple hover:shadow-purple-strong transition-all duration-250 hover:scale-110">
+                <div className="w-10 h-10 bg-gradient-button rounded-lg flex items-center justify-center shadow-turquoise hover:shadow-turquoise-strong transition-all duration-250 hover:scale-110">
                   <Zap className="w-5 h-5 text-primary-contrast" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-text text-glow">Content Generation</h3>
-                  <p className="text-text-secondary text-sm">Generate ad creative</p>
+                  <h3 className="text-lg font-bold text-text dark:text-gray-100 text-glow">Content Generation</h3>
+                  <p className="text-text-secondary dark:text-gray-300 text-sm">Generate ad creative</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="product" className="block text-sm font-medium text-text mb-2">
+                  <label htmlFor="product" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                     Product/Service *
                   </label>
                   <textarea
@@ -1060,13 +1060,13 @@ const FacebookAdGenerator: React.FC = () => {
                     value={formData.product}
                     onChange={(e) => handleInputChange('product', e.target.value)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     placeholder="Describe your product or service"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="audience" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="audience" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                     Target Audience *
                   </label>
                   <textarea
@@ -1074,13 +1074,13 @@ const FacebookAdGenerator: React.FC = () => {
                     value={formData.audience}
                     onChange={(e) => handleInputChange('audience', e.target.value)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     placeholder="Describe your target audience"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="offer" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="offer" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                     Special Offer/CTA
                   </label>
                   <input
@@ -1088,20 +1088,20 @@ const FacebookAdGenerator: React.FC = () => {
                     type="text"
                     value={formData.offer}
                     onChange={(e) => handleInputChange('offer', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     placeholder="e.g., '20% off first order'"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="goal" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="goal" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                     Campaign Goal
                   </label>
                   <select
                     id="goal"
                     value={formData.goal}
                     onChange={(e) => handleInputChange('goal', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   >
                     {adGoals.map((goal) => (
                       <option key={goal} value={goal}>{goal}</option>
@@ -1110,18 +1110,18 @@ const FacebookAdGenerator: React.FC = () => {
                 </div>
 
                 {/* Enhanced Features Section */}
-                <div className="space-y-4 pt-4 border-t border-gray-200">
-                  <h4 className="text-sm font-medium text-gray-700">Advanced Options</h4>
+                <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <h4 className="text-sm font-medium text-text dark:text-gray-300">Advanced Options</h4>
                   
                   {/* Media Upload */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                       Upload Media (Images/Videos)
                     </label>
                     <div className="flex items-center space-x-4">
-                      <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 flex items-center space-x-2 transition-colors">
-                        <Upload className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm text-gray-700">Choose Files</span>
+                      <label className="cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 flex items-center space-x-2 transition-colors">
+                        <Upload className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Choose Files</span>
                         <input
                           type="file"
                           multiple
@@ -1130,20 +1130,20 @@ const FacebookAdGenerator: React.FC = () => {
                           className="hidden"
                         />
                       </label>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         {uploadedMedia.length} file(s) selected
                       </span>
                     </div>
                     {uploadedMedia.length > 0 && (
                       <div className="mt-3 flex flex-wrap gap-2">
                         {uploadedMedia.map((file, index) => (
-                          <div key={index} className="relative bg-gray-100 rounded-lg p-2 flex items-center space-x-2">
-                            <span className="text-sm text-gray-700 truncate max-w-32">
+                          <div key={index} className="relative bg-gray-100 dark:bg-gray-700 rounded-lg p-2 flex items-center space-x-2">
+                            <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-32">
                               {file.name}
                             </span>
                             <button
                               onClick={() => removeMedia(index)}
-                              className="text-red-500 hover:text-red-700 text-sm"
+                              className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm"
                             >
                               ×
                             </button>
@@ -1155,7 +1155,7 @@ const FacebookAdGenerator: React.FC = () => {
 
                   {/* Max Length */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                       Max Content Length (Words)
                     </label>
                     <div className="flex items-center space-x-4">
@@ -1170,7 +1170,7 @@ const FacebookAdGenerator: React.FC = () => {
                         aria-label="Content length slider"
                         title="Adjust maximum content length"
                       />
-                      <span className="text-sm text-gray-600 min-w-[60px]">{maxLength} words</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400 min-w-[60px]">{maxLength} words</span>
                     </div>
                   </div>
 
@@ -1182,10 +1182,10 @@ const FacebookAdGenerator: React.FC = () => {
                         type="checkbox"
                         checked={includeHashtags}
                         onChange={(e) => setIncludeHashtags(e.target.checked)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
                       />
-                      <Hash className="w-4 h-4 text-gray-600" />
-                      <span className="text-sm text-gray-700">Include Hashtags</span>
+                      <Hash className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      <span className="text-sm text-text dark:text-gray-300">Include Hashtags</span>
                     </label>
 
                     {/* Image Prompt Only Toggle */}
@@ -1194,10 +1194,10 @@ const FacebookAdGenerator: React.FC = () => {
                         type="checkbox"
                         checked={imagePromptOnly}
                         onChange={(e) => setImagePromptOnly(e.target.checked)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
                       />
-                      <ImageIcon className="w-4 h-4 text-gray-600" />
-                      <span className="text-sm text-gray-700">Image Prompt Only</span>
+                      <ImageIcon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      <span className="text-sm text-text dark:text-gray-300">Image Prompt Only</span>
                     </label>
 
                     {/* Generate Only Caption Toggle */}
@@ -1206,10 +1206,10 @@ const FacebookAdGenerator: React.FC = () => {
                         type="checkbox"
                         checked={generateOnlyCaption}
                         onChange={(e) => setGenerateOnlyCaption(e.target.checked)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
                       />
-                      <FileText className="w-4 h-4 text-gray-600" />
-                      <span className="text-sm text-gray-700">Generate Only Caption</span>
+                      <FileText className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      <span className="text-sm text-text dark:text-gray-300">Generate Only Caption</span>
                     </label>
                   </div>
                 </div>
@@ -1236,20 +1236,20 @@ const FacebookAdGenerator: React.FC = () => {
 
                          {/* Campaign Form */}
              {adResult && (
-               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+               <div className="bg-bg-alt dark:bg-gray-800 rounded-xl shadow-sm border border-border-purple dark:border-gray-600 p-6">
                  <div className="flex items-center space-x-3 mb-6">
-                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                     <DollarSign className="w-5 h-5 text-green-600" />
+                   <div className="w-10 h-10 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
+                     <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
                    </div>
                    <div>
-                     <h3 className="text-lg font-bold text-gray-900">Facebook Ad Campaign</h3>
-                     <p className="text-gray-600 text-sm">Create a paid advertising campaign</p>
+                     <h3 className="text-lg font-bold text-text dark:text-gray-100">Facebook Ad Campaign</h3>
+                     <p className="text-text-secondary dark:text-gray-300 text-sm">Create a paid advertising campaign</p>
                    </div>
                  </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                       Campaign Selection *
                     </label>
                     
@@ -1262,7 +1262,7 @@ const FacebookAdGenerator: React.FC = () => {
                           onChange={() => handleCampaignModeChange('new')}
                           className="text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="text-sm text-gray-700">Create New Campaign</span>
+                        <span className="text-sm text-text dark:text-gray-300">Create New Campaign</span>
                       </label>
                       <label className="flex items-center space-x-2 cursor-pointer">
                         <input
@@ -1271,14 +1271,14 @@ const FacebookAdGenerator: React.FC = () => {
                           onChange={() => handleCampaignModeChange('existing')}
                           className="text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="text-sm text-gray-700">Select Existing Campaign</span>
+                        <span className="text-sm text-text dark:text-gray-300">Select Existing Campaign</span>
                       </label>
                     </div>
 
                     {/* Campaign Name Input/Selection */}
                     {selectedCampaignMode === 'new' ? (
                       <div>
-                        <label htmlFor="campaignName" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="campaignName" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                           New Campaign Name *
                         </label>
                         <input
@@ -1286,25 +1286,25 @@ const FacebookAdGenerator: React.FC = () => {
                           type="text"
                           value={campaignFormData.campaignName}
                           onChange={(e) => handleCampaignInputChange('campaignName', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                           placeholder="My Facebook Ad Campaign"
                         />
                       </div>
                     ) : (
                       <div>
-                        <label htmlFor="existingCampaign" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="existingCampaign" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                           Select Existing Campaign *
                         </label>
                         {isLoadingCampaigns ? (
-                          <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
-                            <span className="text-gray-500">Loading campaigns...</span>
+                          <div className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
+                            <span className="text-gray-500 dark:text-gray-400">Loading campaigns...</span>
                           </div>
                         ) : existingCampaigns.length > 0 ? (
                           <select
                             id="existingCampaign"
                             value={selectedExistingCampaign}
                             onChange={(e) => handleExistingCampaignSelect(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                           >
                             <option value="">Select a campaign</option>
                             {existingCampaigns.map((campaign) => (
@@ -1314,18 +1314,18 @@ const FacebookAdGenerator: React.FC = () => {
                             ))}
                           </select>
                         ) : (
-                          <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50">
-                            <span className="text-gray-500">No campaigns found. Please create a new campaign.</span>
+                          <div className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
+                            <span className="text-gray-500 dark:text-gray-400">No campaigns found. Please create a new campaign.</span>
                           </div>
                         )}
                         
                         {/* Display selected campaign info */}
                         {selectedExistingCampaign && (
-                          <div className="mt-2 p-3 bg-blue-50 rounded-lg">
-                            <p className="text-sm text-blue-800">
+                          <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <p className="text-sm text-blue-800 dark:text-blue-200">
                               <strong>Selected Campaign:</strong> {campaignFormData.campaignName}
                             </p>
-                            <p className="text-xs text-blue-600 mt-1">
+                            <p className="text-xs text-blue-600 dark:text-blue-300 mt-1">
                               Campaign ID: {selectedExistingCampaign}
                             </p>
                           </div>
@@ -1336,7 +1336,7 @@ const FacebookAdGenerator: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="budget" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                         Budget *
                       </label>
                       <input
@@ -1345,19 +1345,19 @@ const FacebookAdGenerator: React.FC = () => {
                         min="1"
                         value={campaignFormData.budget}
                         onChange={(e) => handleCampaignInputChange('budget', Number(e.target.value))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         placeholder="50"
                       />
                     </div>
                     <div>
-                      <label htmlFor="budgetType" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="budgetType" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                         Budget Type
                       </label>
                       <select
                         id="budgetType"
                         value={campaignFormData.budgetType}
                         onChange={(e) => handleCampaignInputChange('budgetType', e.target.value as 'daily' | 'lifetime')}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       >
                         <option value="daily">Daily</option>
                         <option value="lifetime">Lifetime</option>
@@ -1367,7 +1367,7 @@ const FacebookAdGenerator: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="country" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                         Country *
                       </label>
                       <input
@@ -1375,12 +1375,12 @@ const FacebookAdGenerator: React.FC = () => {
                         type="text"
                         value={campaignFormData.country}
                         onChange={(e) => handleCampaignInputChange('country', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         placeholder="United States"
                       />
                     </div>
                     <div>
-                      <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="city" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                         City
                       </label>
                       <input
@@ -1388,14 +1388,14 @@ const FacebookAdGenerator: React.FC = () => {
                         type="text"
                         value={campaignFormData.city}
                         onChange={(e) => handleCampaignInputChange('city', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         placeholder="New York"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="objective" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="objective" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                       Objective *
                     </label>
                     <select
@@ -1412,7 +1412,7 @@ const FacebookAdGenerator: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Start Date *
                       </label>
                       <input
@@ -1420,11 +1420,11 @@ const FacebookAdGenerator: React.FC = () => {
                         type="date"
                         value={campaignFormData.startDate}
                         onChange={(e) => handleCampaignInputChange('startDate', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                     <div>
-                      <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         End Date *
                       </label>
                       <input
@@ -1432,7 +1432,7 @@ const FacebookAdGenerator: React.FC = () => {
                         type="date"
                         value={campaignFormData.endDate}
                         onChange={(e) => handleCampaignInputChange('endDate', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                   </div>
@@ -1459,20 +1459,20 @@ const FacebookAdGenerator: React.FC = () => {
             )}
 
             {/* New Campaign Creation Section */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Target className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                  <Target className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Create New Campaign</h3>
-                  <p className="text-gray-600 text-sm">Create a new Facebook campaign and get Ad Account ID & Campaign ID</p>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Create New Campaign</h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">Create a new Facebook campaign and get Ad Account ID & Campaign ID</p>
                 </div>
               </div>
 
                              <div className="space-y-4">
                  <div>
-                   <label htmlFor="newCampaignName" className="block text-sm font-medium text-gray-700 mb-2">
+                   <label htmlFor="newCampaignName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                      Campaign Name *
                    </label>
                    <input
@@ -1480,20 +1480,20 @@ const FacebookAdGenerator: React.FC = () => {
                      type="text"
                      value={campaignFormData.campaignName}
                      onChange={(e) => handleCampaignInputChange('campaignName', e.target.value)}
-                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                      placeholder="My New Facebook Campaign"
                    />
                  </div>
 
                  <div>
-                   <label htmlFor="newObjective" className="block text-sm font-medium text-gray-700 mb-2">
+                   <label htmlFor="newObjective" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                      Campaign Objective *
                    </label>
                    <select
                      id="newObjective"
                      value={campaignFormData.objective}
                      onChange={(e) => handleCampaignInputChange('objective', e.target.value as any)}
-                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                    >
                      {objectives.map((obj) => (
                        <option key={obj.value} value={obj.value}>{obj.label}</option>
@@ -1502,7 +1502,7 @@ const FacebookAdGenerator: React.FC = () => {
                  </div>
 
                  <div>
-                   <label htmlFor="newCountry" className="block text-sm font-medium text-gray-700 mb-2">
+                   <label htmlFor="newCountry" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                      Country *
                    </label>
                    <select
@@ -1516,7 +1516,7 @@ const FacebookAdGenerator: React.FC = () => {
                          handleCampaignInputChange('currency', countryData.currency);
                        }
                      }}
-                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                    >
                      <option value="">Select a country</option>
                      {countriesWithCurrencies.map((country) => (
@@ -1529,11 +1529,11 @@ const FacebookAdGenerator: React.FC = () => {
 
                  <div className="grid grid-cols-2 gap-4">
                    <div>
-                     <label htmlFor="newBudget" className="block text-sm font-medium text-gray-700 mb-2">
+                     <label htmlFor="newBudget" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                        Budget ({campaignFormData.currency})
                      </label>
                      <div className="relative">
-                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
+                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">
                          {getCurrentCurrencySymbol()}
                        </span>
                        <input
@@ -1544,21 +1544,21 @@ const FacebookAdGenerator: React.FC = () => {
                            const value = e.target.value === '' ? 0 : Number(e.target.value);
                            handleCampaignInputChange('budget', isNaN(value) ? 0 : value);
                          }}
-                         className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                         className="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                          placeholder="50"
                          min="1"
                        />
                      </div>
                    </div>
                    <div>
-                     <label htmlFor="newBudgetType" className="block text-sm font-medium text-gray-700 mb-2">
+                     <label htmlFor="newBudgetType" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                        Budget Type
                      </label>
                      <select
                        id="newBudgetType"
                        value={campaignFormData.budgetType}
                        onChange={(e) => handleCampaignInputChange('budgetType', e.target.value as any)}
-                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                      >
                        <option value="daily">Daily</option>
                        <option value="lifetime">Lifetime</option>
@@ -1568,7 +1568,7 @@ const FacebookAdGenerator: React.FC = () => {
 
                  {/* Campaign Status Toggle */}
                  <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-2">
+                   <label className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                      Campaign Status
                    </label>
                    <div className="flex space-x-4">
@@ -1579,7 +1579,7 @@ const FacebookAdGenerator: React.FC = () => {
                          onChange={() => handleCampaignInputChange('status', 'PAUSED')}
                          className="text-blue-600 focus:ring-blue-500"
                        />
-                       <span className="text-sm text-gray-700">PAUSED (Safe - Review before starting)</span>
+                       <span className="text-sm text-text dark:text-gray-300">PAUSED (Safe - Review before starting)</span>
                      </label>
                      <label className="flex items-center space-x-2 cursor-pointer">
                        <input
@@ -1588,17 +1588,17 @@ const FacebookAdGenerator: React.FC = () => {
                          onChange={() => handleCampaignInputChange('status', 'ACTIVE')}
                          className="text-blue-600 focus:ring-blue-500"
                        />
-                       <span className="text-sm text-gray-700">ACTIVE (Start immediately)</span>
+                       <span className="text-sm text-text dark:text-gray-300">ACTIVE (Start immediately)</span>
                      </label>
                    </div>
-                   <p className="text-xs text-gray-500 mt-1">
+                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                      PAUSED is recommended for safety. You can activate the campaign later in Facebook Ads Manager.
                    </p>
                  </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="newStartDate" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="newStartDate" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                       Start Date
                     </label>
                     <input
@@ -1606,11 +1606,11 @@ const FacebookAdGenerator: React.FC = () => {
                       type="date"
                       value={campaignFormData.startDate}
                       onChange={(e) => handleCampaignInputChange('startDate', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label htmlFor="newEndDate" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="newEndDate" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                       End Date
                     </label>
                     <input
@@ -1618,7 +1618,7 @@ const FacebookAdGenerator: React.FC = () => {
                       type="date"
                       value={campaignFormData.endDate}
                       onChange={(e) => handleCampaignInputChange('endDate', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                 </div>
@@ -1644,10 +1644,10 @@ const FacebookAdGenerator: React.FC = () => {
 
               {/* Campaign Creation Results */}
               {newCampaignResult && (
-                <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
                   <div className="flex items-center space-x-2 mb-3">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-green-800 font-medium">
+                    <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                    <span className="text-green-800 dark:text-green-200 font-medium">
                       {selectedCampaignMode === 'new' 
                         ? (newCampaignResult.status === 'ACTIVE' 
                             ? 'Campaign Created and Activated!' 
@@ -1658,48 +1658,48 @@ const FacebookAdGenerator: React.FC = () => {
                   
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-green-700 font-medium">Campaign Name:</span>
-                      <span className="text-green-800">{newCampaignResult.campaignName}</span>
+                      <span className="text-green-700 dark:text-green-300 font-medium">Campaign Name:</span>
+                      <span className="text-green-800 dark:text-green-200">{newCampaignResult.campaignName}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-green-700 font-medium">Campaign ID:</span>
+                      <span className="text-green-700 dark:text-green-300 font-medium">Campaign ID:</span>
                       <div className="flex items-center space-x-2">
-                        <span className="text-green-800 font-mono">{newCampaignResult.campaignId}</span>
+                        <span className="text-green-800 dark:text-green-200 font-mono">{newCampaignResult.campaignId}</span>
                         <button
                           onClick={() => copyToClipboard(newCampaignResult.campaignId || '', 'campaignId')}
-                          className="text-green-600 hover:text-green-700"
+                          className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300"
                         >
                           {copiedField === 'campaignId' ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-green-700 font-medium">Ad Account ID:</span>
+                      <span className="text-green-700 dark:text-green-300 font-medium">Ad Account ID:</span>
                       <div className="flex items-center space-x-2">
-                        <span className="text-green-800 font-mono">{newCampaignResult.adAccountId}</span>
+                        <span className="text-green-800 dark:text-green-200 font-mono">{newCampaignResult.adAccountId}</span>
                         <button
                           onClick={() => copyToClipboard(newCampaignResult.adAccountId || '', 'adAccountId')}
-                          className="text-green-600 hover:text-green-700"
+                          className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300"
                         >
                           {copiedField === 'adAccountId' ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-green-700 font-medium">Objective:</span>
-                      <span className="text-green-800">{newCampaignResult.objective}</span>
+                      <span className="text-green-700 dark:text-green-300 font-medium">Objective:</span>
+                      <span className="text-green-800 dark:text-green-200">{newCampaignResult.objective}</span>
                     </div>
                                          <div className="flex justify-between">
-                       <span className="text-green-700 font-medium">Status:</span>
-                       <span className="text-green-800">{newCampaignResult.status}</span>
+                       <span className="text-green-700 dark:text-green-300 font-medium">Status:</span>
+                       <span className="text-green-800 dark:text-green-200">{newCampaignResult.status}</span>
                      </div>
                      <div className="flex justify-between">
-                       <span className="text-green-700 font-medium">Country:</span>
-                       <span className="text-green-800">{newCampaignResult.country}</span>
+                       <span className="text-green-700 dark:text-green-300 font-medium">Country:</span>
+                       <span className="text-green-800 dark:text-green-200">{newCampaignResult.country}</span>
                      </div>
                      <div className="flex justify-between">
-                       <span className="text-green-700 font-medium">Currency:</span>
-                       <span className="text-green-800">{newCampaignResult.currency} ({getCurrencySymbol(newCampaignResult.currency || '')})</span>
+                       <span className="text-green-700 dark:text-green-300 font-medium">Currency:</span>
+                       <span className="text-green-800 dark:text-green-200">{newCampaignResult.currency} ({getCurrencySymbol(newCampaignResult.currency || '')})</span>
                      </div>
                   </div>
                   
@@ -1764,7 +1764,7 @@ const FacebookAdGenerator: React.FC = () => {
                     <div className="space-y-4">
                       {/* Ad Set Name */}
                       <div>
-                        <label htmlFor="adSetName" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="adSetName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Ad Set Name
                         </label>
                         <input
@@ -1773,13 +1773,13 @@ const FacebookAdGenerator: React.FC = () => {
                           value={adSetFormData.adSetName}
                           onChange={(e) => handleAdSetInputChange('adSetName', e.target.value)}
                           placeholder="e.g., Young Professionals 25-35"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         />
                       </div>
 
                       {/* Daily Budget */}
                       <div>
-                        <label htmlFor="adSetBudget" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="adSetBudget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Daily Budget ({getCurrencySymbol(newCampaignResult.currency || 'USD')})
                         </label>
                         <input
@@ -1792,14 +1792,14 @@ const FacebookAdGenerator: React.FC = () => {
                             const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
                             handleAdSetInputChange('dailyBudget', isNaN(value) ? 0 : value);
                           }}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         />
                       </div>
 
                       {/* Date Range */}
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label htmlFor="adSetStartDate" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="adSetStartDate" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                             Start Date
                           </label>
                           <input
@@ -1807,11 +1807,11 @@ const FacebookAdGenerator: React.FC = () => {
                             type="date"
                             value={adSetFormData.startDate}
                             onChange={(e) => handleAdSetInputChange('startDate', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                           />
                         </div>
                         <div>
-                          <label htmlFor="adSetEndDate" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="adSetEndDate" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                             End Date
                           </label>
                           <input
@@ -1819,25 +1819,25 @@ const FacebookAdGenerator: React.FC = () => {
                             type="date"
                             value={adSetFormData.endDate}
                             onChange={(e) => handleAdSetInputChange('endDate', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                           />
                         </div>
                       </div>
 
                       {/* Targeting */}
                       <div className="space-y-4">
-                        <h4 className="text-sm font-medium text-gray-700">Targeting</h4>
+                        <h4 className="text-sm font-medium text-text dark:text-gray-300">Targeting</h4>
                         
                         {/* Countries */}
                         <div>
-                          <label htmlFor="adSetCountries" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="adSetCountries" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                             Countries
                           </label>
                           <select
                             id="adSetCountries"
                             value={adSetFormData.targeting.countries[0] || ''}
                             onChange={(e) => handleTargetingChange('countries', [e.target.value])}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                           >
                             <option value="">Select a country</option>
                             {countriesWithCurrencies.map(country => (
@@ -1851,7 +1851,7 @@ const FacebookAdGenerator: React.FC = () => {
                         {/* Age Range */}
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label htmlFor="adSetAgeMin" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="adSetAgeMin" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                               Minimum Age
                             </label>
                             <input
@@ -1864,11 +1864,11 @@ const FacebookAdGenerator: React.FC = () => {
                                 const value = e.target.value === '' ? 18 : parseInt(e.target.value);
                                 handleTargetingChange('ageMin', isNaN(value) ? 18 : value);
                               }}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                             />
                           </div>
                           <div>
-                            <label htmlFor="adSetAgeMax" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="adSetAgeMax" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                               Maximum Age
                             </label>
                             <input
@@ -1881,21 +1881,21 @@ const FacebookAdGenerator: React.FC = () => {
                                 const value = e.target.value === '' ? 65 : parseInt(e.target.value);
                                 handleTargetingChange('ageMax', isNaN(value) ? 65 : value);
                               }}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                             />
                           </div>
                         </div>
 
                         {/* Optimization Goal */}
                         <div>
-                          <label htmlFor="adSetOptimization" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="adSetOptimization" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                             Optimization Goal
                           </label>
                           <select
                             id="adSetOptimization"
                             value={adSetFormData.optimizationGoal}
                             onChange={(e) => handleAdSetInputChange('optimizationGoal', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                           >
                             {optimizationGoals.map(goal => (
                               <option key={goal.value} value={goal.value}>
@@ -1907,14 +1907,14 @@ const FacebookAdGenerator: React.FC = () => {
 
                         {/* Billing Event */}
                         <div>
-                          <label htmlFor="adSetBilling" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="adSetBilling" className="block text-sm font-medium text-text dark:text-gray-300 mb-2">
                             Billing Event
                           </label>
                           <select
                             id="adSetBilling"
                             value={adSetFormData.billingEvent}
                             onChange={(e) => handleAdSetInputChange('billingEvent', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                           >
                             {billingEvents.map(event => (
                               <option key={event.value} value={event.value}>
@@ -1950,45 +1950,45 @@ const FacebookAdGenerator: React.FC = () => {
 
               {/* Ad Set Creation Results */}
               {adSetResult && (
-                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
                   <div className="flex items-center space-x-2 mb-3">
-                    <CheckCircle className="w-5 h-5 text-blue-600" />
-                    <span className="text-blue-800 font-medium">Ad Set Created Successfully!</span>
+                    <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <span className="text-blue-800 dark:text-blue-200 font-medium">Ad Set Created Successfully!</span>
                   </div>
                   
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-blue-700 font-medium">Ad Set Name:</span>
-                      <span className="text-blue-800">{adSetResult.adSetName}</span>
+                      <span className="text-blue-700 dark:text-blue-300 font-medium">Ad Set Name:</span>
+                      <span className="text-blue-800 dark:text-blue-200">{adSetResult.adSetName}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-blue-700 font-medium">Ad Set ID:</span>
+                      <span className="text-blue-700 dark:text-blue-300 font-medium">Ad Set ID:</span>
                       <div className="flex items-center space-x-2">
-                        <span className="text-blue-800 font-mono">{adSetResult.adSetId}</span>
+                        <span className="text-blue-800 dark:text-blue-200 font-mono">{adSetResult.adSetId}</span>
                         <button
                           onClick={() => copyToClipboard(adSetResult.adSetId || '', 'adSetId')}
-                          className="text-blue-600 hover:text-blue-700"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                         >
                           {copiedField === 'adSetId' ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-blue-700 font-medium">Daily Budget:</span>
-                      <span className="text-blue-800">{getCurrencySymbol(newCampaignResult?.currency || 'USD')}{adSetResult.dailyBudget}</span>
+                      <span className="text-blue-700 dark:text-blue-300 font-medium">Daily Budget:</span>
+                      <span className="text-blue-800 dark:text-blue-200">{getCurrencySymbol(newCampaignResult?.currency || 'USD')}{adSetResult.dailyBudget}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-blue-700 font-medium">Age Range:</span>
-                      <span className="text-blue-800">{adSetResult.targeting?.age_min} - {adSetResult.targeting?.age_max}</span>
+                      <span className="text-blue-700 dark:text-blue-300 font-medium">Age Range:</span>
+                      <span className="text-blue-800 dark:text-blue-200">{adSetResult.targeting?.age_min} - {adSetResult.targeting?.age_max}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-blue-700 font-medium">Countries:</span>
-                      <span className="text-blue-800">{adSetResult.targeting?.geo_locations?.countries?.join(', ')}</span>
+                      <span className="text-blue-700 dark:text-blue-300 font-medium">Countries:</span>
+                      <span className="text-blue-800 dark:text-blue-200">{adSetResult.targeting?.geo_locations?.countries?.join(', ')}</span>
                     </div>
                   </div>
                   
-                  <div className="mt-4 p-3 bg-blue-100 rounded-lg">
-                    <p className="text-blue-800 text-sm">
+                  <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <p className="text-blue-800 dark:text-blue-200 text-sm">
                       <strong>Next Step:</strong> Create ads within this Ad Set to start your campaign. 
                       You can create multiple ads to test different creatives and messages.
                     </p>
@@ -2005,13 +2005,13 @@ const FacebookAdGenerator: React.FC = () => {
                     </button>
 
                     {showAdForm && (
-                      <div className="mt-4 p-4 bg-white border border-gray-200 rounded-lg">
-                        <h4 className="text-lg font-semibold text-gray-900 mb-4">Create New Ad</h4>
+                      <div className="mt-4 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Create New Ad</h4>
                         
                         <div className="space-y-4">
                           {/* Ad Name */}
                           <div>
-                            <label htmlFor="adName" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="adName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                               Ad Name *
                             </label>
                             <input
@@ -2019,14 +2019,14 @@ const FacebookAdGenerator: React.FC = () => {
                               type="text"
                               value={adFormData.adName}
                               onChange={(e) => handleAdInputChange('adName', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                               placeholder="My Facebook Ad"
                             />
                           </div>
 
                           {/* Headline */}
                           <div>
-                            <label htmlFor="adHeadline" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="adHeadline" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                               Headline * (Max 40 characters)
                             </label>
                             <input
@@ -2035,17 +2035,17 @@ const FacebookAdGenerator: React.FC = () => {
                               maxLength={40}
                               value={adFormData.headline}
                               onChange={(e) => handleAdInputChange('headline', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                               placeholder="Compelling headline for your ad"
                             />
-                            <div className="text-xs text-gray-500 mt-1 text-right">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-right">
                               {adFormData.headline.length}/40
                             </div>
                           </div>
 
                           {/* Description */}
                           <div>
-                            <label htmlFor="adDescription" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="adDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                               Description * (Max 125 characters)
                             </label>
                             <textarea
@@ -2054,17 +2054,17 @@ const FacebookAdGenerator: React.FC = () => {
                               rows={3}
                               value={adFormData.description}
                               onChange={(e) => handleAdInputChange('description', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                               placeholder="Detailed description of your product or service"
                             />
-                            <div className="text-xs text-gray-500 mt-1 text-right">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-right">
                               {adFormData.description.length}/125
                             </div>
                           </div>
 
                           {/* Generated Image Preview */}
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                               Ad Image *
                             </label>
                             {adResult?.imageUrl ? (
@@ -2095,14 +2095,14 @@ const FacebookAdGenerator: React.FC = () => {
 
                           {/* Call to Action */}
                           <div>
-                            <label htmlFor="adCallToAction" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="adCallToAction" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                               Call to Action
                             </label>
                             <select
                               id="adCallToAction"
                               value={adFormData.callToAction}
                               onChange={(e) => handleAdInputChange('callToAction', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                             >
                               {callToActions.map(action => (
                                 <option key={action.value} value={action.value}>
@@ -2114,7 +2114,7 @@ const FacebookAdGenerator: React.FC = () => {
 
                           {/* Landing Page URL */}
                           <div>
-                            <label htmlFor="adLandingPage" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="adLandingPage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                               Landing Page URL
                             </label>
                             <input
@@ -2122,10 +2122,10 @@ const FacebookAdGenerator: React.FC = () => {
                               type="url"
                               value={adFormData.landingPageUrl}
                               onChange={(e) => handleAdInputChange('landingPageUrl', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                               placeholder="https://example.com/landing-page"
                             />
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                               Where users will go when they click your ad
                             </p>
                           </div>
@@ -2255,9 +2255,9 @@ const FacebookAdGenerator: React.FC = () => {
               <>
                 {/* Ad Image */}
                 {adResult.imageUrl && (
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Generated Ad Image</h3>
-                    <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+                  <div className="bg-bg-alt dark:bg-gray-800 rounded-xl shadow-sm border border-border-purple dark:border-gray-600 p-6">
+                    <h3 className="text-lg font-bold text-text dark:text-gray-100 mb-4">Generated Ad Image</h3>
+                    <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
                       <img 
                         src={adResult.imageUrl} 
                         alt="Generated Ad Image" 
@@ -2269,18 +2269,18 @@ const FacebookAdGenerator: React.FC = () => {
                       />
                     </div>
                     {adResult.imageDescription && (
-                      <p className="text-xs text-gray-500 mt-2">Image: {adResult.imageDescription}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Image: {adResult.imageDescription}</p>
                     )}
                   </div>
                 )}
 
                 {/* Ad Caption */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="bg-bg-alt dark:bg-gray-800 rounded-xl shadow-sm border border-border-purple dark:border-gray-600 p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900">Ad Caption</h3>
+                    <h3 className="text-lg font-bold text-text dark:text-gray-100">Ad Caption</h3>
                     <button
                       onClick={() => copyToClipboard(adResult.caption, 'caption')}
-                      className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
+                      className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                     >
                       {copiedField === 'caption' ? (
                         <CheckCircle className="w-4 h-4" />
@@ -2290,26 +2290,26 @@ const FacebookAdGenerator: React.FC = () => {
                       <span className="text-sm">{copiedField === 'caption' ? 'Copied!' : 'Copy'}</span>
                     </button>
                   </div>
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <p className="text-gray-900 whitespace-pre-wrap">{adResult.caption}</p>
+                  <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                    <p className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap">{adResult.caption}</p>
                   </div>
                 </div>
 
                 {/* Enhanced Features Preview */}
                 {(uploadedMedia.length > 0 || generatedHashtags || finalPost) && (
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Enhanced Features Preview</h3>
+                  <div className="bg-bg-alt dark:bg-gray-800 rounded-xl shadow-sm border border-border-purple dark:border-gray-600 p-6">
+                    <h3 className="text-lg font-bold text-text dark:text-gray-100 mb-4">Enhanced Features Preview</h3>
                     
                     <div className="space-y-4">
                       {/* Uploaded Media Preview */}
                       {uploadedMedia.length > 0 && (
                         <div>
-                          <h4 className="text-md font-medium text-gray-700 mb-2">Uploaded Media</h4>
+                          <h4 className="text-md font-medium text-text dark:text-gray-300 mb-2">Uploaded Media</h4>
                           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {uploadedMedia.map((file, index) => (
-                              <div key={index} className="relative bg-gray-100 rounded-lg p-2">
-                                <div className="aspect-square bg-gray-200 rounded flex items-center justify-center">
-                                  <span className="text-xs text-gray-500 text-center">
+                              <div key={index} className="relative bg-gray-100 dark:bg-gray-700 rounded-lg p-2">
+                                <div className="aspect-square bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center">
+                                  <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
                                     {file.type.startsWith('image/') ? '📷' : '🎥'} {file.name}
                                   </span>
                                 </div>
@@ -2322,9 +2322,9 @@ const FacebookAdGenerator: React.FC = () => {
                       {/* Generated Hashtags Preview */}
                       {generatedHashtags && includeHashtags && !imagePromptOnly && (
                         <div>
-                          <h4 className="text-md font-medium text-gray-700 mb-2">Generated Hashtags</h4>
-                          <div className="bg-blue-50 rounded-lg p-4">
-                            <p className="text-blue-800 whitespace-pre-wrap">
+                          <h4 className="text-md font-medium text-text dark:text-gray-300 mb-2">Generated Hashtags</h4>
+                          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                            <p className="text-blue-800 dark:text-blue-200 whitespace-pre-wrap">
                               {generatedHashtags}
                             </p>
                           </div>
@@ -2334,12 +2334,12 @@ const FacebookAdGenerator: React.FC = () => {
                       {/* Final Post Preview */}
                       {finalPost && (
                         <div>
-                          <h4 className="text-md font-medium text-gray-700 mb-2">Final Post (with enhancements)</h4>
-                          <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                            <p className="text-green-800 whitespace-pre-wrap">
+                          <h4 className="text-md font-medium text-text dark:text-gray-300 mb-2">Final Post (with enhancements)</h4>
+                          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-700">
+                            <p className="text-green-800 dark:text-green-200 whitespace-pre-wrap">
                               {finalPost}
                             </p>
-                            <div className="mt-2 text-xs text-green-600">
+                            <div className="mt-2 text-xs text-green-600 dark:text-green-400">
                               Word count: {finalPost.split(' ').length} words
                             </div>
                           </div>
@@ -2350,12 +2350,12 @@ const FacebookAdGenerator: React.FC = () => {
                 )}
 
                 {/* Hashtags */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="bg-bg-alt dark:bg-gray-800 rounded-xl shadow-sm border border-border-purple dark:border-gray-600 p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900">Hashtags</h3>
+                    <h3 className="text-lg font-bold text-text dark:text-gray-100">Hashtags</h3>
                     <button
                       onClick={() => copyToClipboard(adResult.hashtags.join(' '), 'hashtags')}
-                      className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
+                      className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                     >
                       {copiedField === 'hashtags' ? (
                         <CheckCircle className="w-4 h-4" />
@@ -2369,7 +2369,7 @@ const FacebookAdGenerator: React.FC = () => {
                     {adResult.hashtags.map((hashtag, index) => (
                       <span
                         key={index}
-                        className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+                        className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-medium"
                       >
                         {hashtag}
                       </span>
@@ -2378,12 +2378,12 @@ const FacebookAdGenerator: React.FC = () => {
                 </div>
 
                 {/* Keywords */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="bg-bg-alt dark:bg-gray-800 rounded-xl shadow-sm border border-border-purple dark:border-gray-600 p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900">Targeting Keywords</h3>
+                    <h3 className="text-lg font-bold text-text dark:text-gray-100">Targeting Keywords</h3>
                     <button
                       onClick={() => copyToClipboard(adResult.keywords.join(', '), 'keywords')}
-                      className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
+                      className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                     >
                       {copiedField === 'keywords' ? (
                         <CheckCircle className="w-4 h-4" />
@@ -2397,9 +2397,9 @@ const FacebookAdGenerator: React.FC = () => {
                     {adResult.keywords.map((keyword, index) => (
                       <div
                         key={index}
-                        className="bg-green-50 border border-green-200 rounded-lg p-3"
+                        className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-3"
                       >
-                        <span className="text-green-800 font-medium">{keyword}</span>
+                        <span className="text-green-800 dark:text-green-200 font-medium">{keyword}</span>
                       </div>
                     ))}
                   </div>
@@ -2421,27 +2421,27 @@ const FacebookAdGenerator: React.FC = () => {
 
                 {/* Success Messages */}
                 {publishedPostId && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-6">
                     <div className="flex items-center space-x-2 mb-2">
-                      <CheckCircle className="w-5 h-5 text-blue-600" />
-                      <span className="text-blue-800 font-medium">Content Published to Facebook Page!</span>
+                      <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      <span className="text-blue-800 dark:text-blue-200 font-medium">Content Published to Facebook Page!</span>
                     </div>
-                    <p className="text-blue-700 text-sm">Post ID: {publishedPostId}</p>
-                    <p className="text-blue-600 text-xs mt-1">This is a regular page post, not an ad campaign.</p>
+                    <p className="text-blue-700 dark:text-blue-300 text-sm">Post ID: {publishedPostId}</p>
+                    <p className="text-blue-600 dark:text-blue-400 text-xs mt-1">This is a regular page post, not an ad campaign.</p>
                   </div>
                 )}
 
                 {createdCampaignId && (
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-xl p-6">
                     <div className="flex items-center space-x-2 mb-2">
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                      <span className="text-green-800 font-medium">Facebook Ad Campaign Created Successfully!</span>
+                      <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      <span className="text-green-800 dark:text-green-200 font-medium">Facebook Ad Campaign Created Successfully!</span>
                     </div>
-                    <p className="text-green-700 text-sm">Campaign ID: {createdCampaignId}</p>
-                    {createdAdId && <p className="text-green-700 text-sm">Ad ID: {createdAdId}</p>}
-                    <div className="mt-3 p-3 bg-green-100 rounded-lg">
-                      <p className="text-green-800 text-sm font-medium">🎯 Your ad campaign is ready!</p>
-                      <p className="text-green-700 text-xs mt-1">
+                    <p className="text-green-700 dark:text-green-300 text-sm">Campaign ID: {createdCampaignId}</p>
+                    {createdAdId && <p className="text-green-700 dark:text-green-300 text-sm">Ad ID: {createdAdId}</p>}
+                    <div className="mt-3 p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                      <p className="text-green-800 dark:text-green-200 text-sm font-medium">🎯 Your ad campaign is ready!</p>
+                      <p className="text-green-700 dark:text-green-300 text-xs mt-1">
                         • Campaign is created in PAUSED status for safety<br/>
                         • Go to Facebook Ads Manager to review and activate<br/>
                         • You can adjust targeting, budget, and scheduling there
@@ -2451,7 +2451,7 @@ const FacebookAdGenerator: React.FC = () => {
                 )}
 
                 {/* Action Buttons */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="bg-bg-alt dark:bg-gray-800 rounded-xl shadow-sm border border-border-purple dark:border-gray-600 p-6">
                   <div className="space-y-4">
                     {/* Create Ad Campaign Button */}
                     {adResult && !createdCampaignId && (
@@ -2477,7 +2477,7 @@ const FacebookAdGenerator: React.FC = () => {
                     {/* Publish to Page Button */}
                     {!publishedPostId && storedPageId && (
                       <div className="border-t pt-4">
-                        <p className="text-gray-600 text-sm mb-3 text-center">OR publish as a regular page post:</p>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 text-center">OR publish as a regular page post:</p>
                         <button
                           onClick={handlePublishAd}
                           disabled={isPublishing}
@@ -2519,30 +2519,30 @@ const FacebookAdGenerator: React.FC = () => {
             )}
 
             {!adResult && !isGenerating && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 p-8 text-center transition-colors duration-300">
                 <div className="flex justify-center space-x-4 mb-4">
-                  <Target className="w-12 h-12 text-gray-400" />
-                  <ImageIcon className="w-12 h-12 text-gray-400" />
+                  <Target className="w-12 h-12 text-gray-400 dark:text-gray-500" />
+                  <ImageIcon className="w-12 h-12 text-gray-400 dark:text-gray-500" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Ready to Generate Your Ad</h3>
-                <p className="text-gray-600">Fill in the campaign details and click generate to create your optimized Facebook ad with image.</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Ready to Generate Your Ad</h3>
+                <p className="text-gray-600 dark:text-gray-300">Fill in the campaign details and click generate to create your optimized Facebook ad with image.</p>
               </div>
             )}
           </div>
         </div>
 
                  {/* Information Section */}
-         <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-6 mt-8">
+         <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 border border-blue-200 dark:border-gray-600 rounded-xl p-6 mt-8 transition-colors duration-300">
            <div className="flex items-start space-x-3">
-             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-               <span className="text-blue-600 font-bold text-sm">ℹ️</span>
+             <div className="w-8 h-8 bg-blue-100 dark:bg-gray-600 rounded-lg flex items-center justify-center flex-shrink-0">
+               <span className="text-blue-600 dark:text-blue-400 font-bold text-sm">ℹ️</span>
              </div>
              <div>
-               <h4 className="text-blue-900 font-semibold mb-3">Understanding the Difference:</h4>
+               <h4 className="text-blue-900 dark:text-gray-100 font-semibold mb-3">Understanding the Difference:</h4>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <div className="bg-white rounded-lg p-4 border border-blue-200">
-                   <h5 className="font-semibold text-green-700 mb-2">🎯 Facebook Ad Campaign</h5>
-                   <ul className="text-sm text-gray-700 space-y-1">
+                 <div className="bg-white dark:bg-gray-700 rounded-lg p-4 border border-blue-200 dark:border-gray-600 transition-colors duration-300">
+                   <h5 className="font-semibold text-green-700 dark:text-green-400 mb-2">🎯 Facebook Ad Campaign</h5>
+                   <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
                      <li>• Paid advertising with targeting</li>
                      <li>• Reaches new audiences</li>
                      <li>• Controlled budget and scheduling</li>
@@ -2550,9 +2550,9 @@ const FacebookAdGenerator: React.FC = () => {
                      <li>• Requires Facebook Ads Manager access</li>
                    </ul>
                  </div>
-                 <div className="bg-white rounded-lg p-4 border border-blue-200">
-                   <h5 className="font-semibold text-blue-700 mb-2">📝 Page Post</h5>
-                   <ul className="text-sm text-gray-700 space-y-1">
+                 <div className="bg-white dark:bg-gray-700 rounded-lg p-4 border border-blue-200 dark:border-gray-600 transition-colors duration-300">
+                   <h5 className="font-semibold text-blue-700 dark:text-blue-400 mb-2">📝 Page Post</h5>
+                   <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
                      <li>• Free organic content</li>
                      <li>• Reaches your existing followers</li>
                      <li>• No targeting or budget control</li>
@@ -2566,12 +2566,12 @@ const FacebookAdGenerator: React.FC = () => {
          </div>
 
          {/* Best Practices */}
-         <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mt-6">
+         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6 mt-6">
            <div className="flex items-start space-x-3">
-             <Zap className="w-6 h-6 text-blue-600 mt-0.5" />
+             <Zap className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-0.5" />
              <div>
-               <h4 className="text-blue-900 font-semibold mb-2">Facebook Ad Best Practices:</h4>
-               <ul className="text-blue-800 text-sm space-y-1 list-disc list-inside">
+               <h4 className="text-blue-900 dark:text-blue-100 font-semibold mb-2">Facebook Ad Best Practices:</h4>
+               <ul className="text-blue-800 dark:text-blue-200 text-sm space-y-1 list-disc list-inside">
                  <li>Keep your headline under 25 characters for mobile optimization</li>
                  <li>Use high-quality, eye-catching visuals that stop the scroll</li>
                  <li>Include a clear, compelling call-to-action (CTA)</li>
@@ -2586,15 +2586,15 @@ const FacebookAdGenerator: React.FC = () => {
         {/* Credential Modal */}
         {showCredentialModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center space-x-2">
                   <Key className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">Save Facebook Ads Credentials</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Save Facebook Ads Credentials</h3>
                 </div>
                 <button
                   onClick={() => setShowCredentialModal(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                   aria-label="Close modal"
                 >
                   <X className="w-5 h-5" />
@@ -2602,7 +2602,7 @@ const FacebookAdGenerator: React.FC = () => {
               </div>
 
               <div className="p-6 space-y-4">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   Save your Facebook Ads credentials to the Credential Vault for future use. 
                   This will allow you to create Ad Sets and Ads without re-entering your credentials.
                 </p>
@@ -2621,7 +2621,7 @@ const FacebookAdGenerator: React.FC = () => {
 
                 {/* Access Token */}
                 <div>
-                  <label htmlFor="adsAccessToken" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="adsAccessToken" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Facebook Ads Access Token *
                   </label>
                   <input
@@ -2630,16 +2630,16 @@ const FacebookAdGenerator: React.FC = () => {
                     value={adsAccessToken}
                     onChange={(e) => setAdsAccessToken(e.target.value)}
                     placeholder="Enter your Facebook Ads access token"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Get this from <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Facebook Graph API Explorer</a>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Get this from <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">Facebook Graph API Explorer</a>
                   </p>
                 </div>
 
                 {/* Ad Account ID */}
                 <div>
-                  <label htmlFor="adsAccountId" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="adsAccountId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Ad Account ID *
                   </label>
                   <input
@@ -2648,16 +2648,16 @@ const FacebookAdGenerator: React.FC = () => {
                     value={adsAccountId}
                     onChange={(e) => setAdsAccountId(e.target.value)}
                     placeholder="Enter your Ad Account ID (numbers only)"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Enter only the numbers (e.g., 123456789 for act_123456789)
                   </p>
                 </div>
 
                 {/* Campaign ID */}
                 <div>
-                  <label htmlFor="adsCampaignId" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="adsCampaignId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Campaign ID
                   </label>
                   <input
@@ -2666,9 +2666,9 @@ const FacebookAdGenerator: React.FC = () => {
                     value={adsCampaignId}
                     onChange={(e) => setAdsCampaignId(e.target.value)}
                     placeholder="Enter your Campaign ID (optional)"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Optional: Save a specific campaign ID for quick access
                   </p>
                 </div>

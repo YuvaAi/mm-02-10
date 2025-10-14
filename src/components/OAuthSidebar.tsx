@@ -119,22 +119,20 @@ const OAuthSidebar: React.FC = () => {
         </GlassPanel>
       )}
 
-      {/* Connect Social Media Accounts */}
-      <GlassPanel variant="purple" className="animate-slide-in-left aspect-square">
-        <div className="glass-panel-content">
-          <div>
-            <OAuthLoginButtons 
-              onConnect={(platform) => {
-                console.log(`Initiating OAuth for ${platform}`);
-              }}
-              className="max-w-full"
-            />
-          </div>
-          
-          {/* Manual Auto-Connect Button */}
-          {currentUser?.providerData.some(provider => 
-            provider.providerId === 'facebook.com' || provider.providerId === 'google.com'
-          ) && (
+      {/* OAuth Login Buttons - Now renders as separate cards */}
+      <OAuthLoginButtons 
+        onConnect={(platform) => {
+          console.log(`Initiating OAuth for ${platform}`);
+        }}
+        className="max-w-full"
+      />
+      
+      {/* Manual Auto-Connect Button */}
+      {currentUser?.providerData.some(provider => 
+        provider.providerId === 'facebook.com' || provider.providerId === 'google.com'
+      ) && (
+        <GlassPanel variant="purple" className="animate-slide-in-left">
+          <div className="glass-panel-content">
             <div className="border-t border-gray-200 dark:border-gray-600 pt-2 mt-2">
               <p className="text-xs text-text-secondary mb-1">
                 Already logged in with social media?
@@ -154,9 +152,9 @@ const OAuthSidebar: React.FC = () => {
                 )}
               </button>
             </div>
-          )}
-        </div>
-      </GlassPanel>
+          </div>
+        </GlassPanel>
+      )}
     </div>
   );
 };

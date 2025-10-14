@@ -6,6 +6,7 @@ import { publishToLinkedIn } from '../api/linkedin';
 import { useAuth } from '../Contexts/AuthContext';
 import { getCredentials } from '../firebase/firestore';
 import { UserCredentials } from '../firebase/types';
+import LinkedInPageSelectionModal from './LinkedInPageSelectionModal';
 
 interface MultiPlatformPublisherProps {
   content: string;
@@ -35,6 +36,12 @@ const MultiPlatformPublisher: React.FC<MultiPlatformPublisherProps> = ({
   const [publishStatus, setPublishStatus] = useState<PublishStatus>({});
   const [statusMessages, setStatusMessages] = useState<{ [key: string]: string }>({});
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showLinkedInPageModal, setShowLinkedInPageModal] = useState(false);
+  const [selectedLinkedInPage, setSelectedLinkedInPage] = useState<{
+    pageId: string;
+    pageName: string;
+    isOrganization: boolean;
+  } | null>(null);
 
   const platforms = [
     {
@@ -122,6 +129,12 @@ const MultiPlatformPublisher: React.FC<MultiPlatformPublisherProps> = ({
       return;
     }
 
+    // For LinkedIn, check if we need to show page selection modal
+    if (platform === 'linkedin' && credentials.hasOrganizationPages && !selectedLinkedInPage) {
+      setShowLinkedInPageModal(true);
+      return;
+    }
+
     // Additional validation for Instagram
     if (platform === 'instagram') {
       if (!credentials.instagramUserId || !credentials.accessToken) {
@@ -188,12 +201,16 @@ const MultiPlatformPublisher: React.FC<MultiPlatformPublisherProps> = ({
           console.log('📸 Instagram result:', result);
           break;
         case 'linkedin':
+          // Use selected page if available, otherwise fall back to stored page
+          const linkedInPageId = selectedLinkedInPage?.pageId || credentials.linkedInPageId || credentials.linkedInUserId || '';
+          const isOrganizationPage = selectedLinkedInPage?.isOrganization || credentials.hasOrganizationPages || false;
+          
           result = await publishToLinkedIn(
             content,
-            credentials.linkedInPageId || credentials.linkedInUserId || '',
+            linkedInPageId,
             credentials.accessToken,
             mediaFiles,
-            credentials.hasOrganizationPages || false
+            isOrganizationPage
           );
           break;
         default:
@@ -219,6 +236,13 @@ const MultiPlatformPublisher: React.FC<MultiPlatformPublisherProps> = ({
       }));
       onPublishError?.(platform, error instanceof Error ? error.message : 'Unknown error');
     }
+  };
+
+  const handleLinkedInPageSelect = (pageId: string, pageName: string, isOrganization: boolean) => {
+    setSelectedLinkedInPage({ pageId, pageName, isOrganization });
+    setShowLinkedInPageModal(false);
+    // Automatically proceed with publishing after page selection
+    handlePublish('linkedin');
   };
 
   const getStatusIcon = (platform: string) => {
@@ -262,9 +286,9 @@ const MultiPlatformPublisher: React.FC<MultiPlatformPublisherProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           Publish to Multiple Platforms
         </h3>
         <button
@@ -321,6 +345,13 @@ const MultiPlatformPublisher: React.FC<MultiPlatformPublisherProps> = ({
                   No credentials found
                 </div>
               )}
+              
+              {/* Show selected LinkedIn page */}
+              {platform.key === 'linkedin' && selectedLinkedInPage && (
+                <div className="text-xs text-blue-600 text-center mt-1">
+                  Selected: {selectedLinkedInPage.pageName}
+                </div>
+              )}
             </div>
           );
         })}
@@ -329,6 +360,16 @@ const MultiPlatformPublisher: React.FC<MultiPlatformPublisherProps> = ({
       <div className="text-sm text-gray-600">
         <p>💡 Tip: Add your social media credentials in the Credential Vault to enable publishing.</p>
       </div>
+
+      {/* LinkedIn Page Selection Modal */}
+      {storedCredentials.linkedin && (
+        <LinkedInPageSelectionModal
+          isOpen={showLinkedInPageModal}
+          onClose={() => setShowLinkedInPageModal(false)}
+          onPageSelect={handleLinkedInPageSelect}
+          credentials={storedCredentials.linkedin}
+        />
+      )}
     </div>
   );
 };
